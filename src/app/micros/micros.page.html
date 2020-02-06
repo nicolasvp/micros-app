@@ -1,0 +1,48 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons>
+            <ion-button>
+                <ion-icon slot="start" name="pin"></ion-icon>
+                Bus Stop
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+    <ion-toolbar>
+        <ion-label style="text-align: center;">
+            <h2 style="padding-top: 10px; font-size: 22px">Micros</h2>
+            <h3 style="font-size: 16px;" class="animated fadeIn fast">Paradero {{ stopCode }}</h3>
+        </ion-label>
+    </ion-toolbar>
+    <ion-card>
+        <ion-card-content>
+            <ion-list>
+                <div style="text-align: center" *ngIf="microsSpinner">
+                    <ion-spinner name="lines"></ion-spinner>
+                </div>
+                <div style="text-align: center" *ngIf="errorPresent">
+                    <ion-label>
+                        <h2>{{ errorMessage }}</h2>
+                    </ion-label>
+                </div>
+                <ion-item *ngFor="let micro of micros" class="animated fadeIn fast" (press)="microOptions(micro.route_id)">
+                    <ion-thumbnail slot="start" class="thumbnail-text">
+                        <img src="../../assets/img/background-1.jpg">
+                        <div class="centered">
+                            <b class="max-five-letters thumbnail-text-white">{{ micro.route_id }}</b>
+                        </div>
+                    </ion-thumbnail>
+                    <ion-label>
+                        <h2>{{ micro.arrival_estimation }}</h2>
+                        <h3>{{ micro.bus_distance }}</h3>
+                    </ion-label>
+                </ion-item>
+            </ion-list>
+        </ion-card-content>
+    </ion-card>
+</ion-content>

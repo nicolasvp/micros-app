@@ -1,0 +1,56 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons>
+            <ion-button>
+                <ion-icon slot="start" name="pin"></ion-icon>
+                Bus Stop
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-toolbar>
+        <ion-title style="text-align: center;">
+            <h3>Paraderos</h3>
+        </ion-title>
+    </ion-toolbar>
+    <ion-card>
+        <ion-card-content>
+            <ion-list>
+                <div style="text-align: center" *ngIf="stopsSpinner">
+                    <ion-spinner name="lines"></ion-spinner>
+                </div>
+                <div style="text-align: center" *ngIf="errorPresent">
+                    <ion-label>
+                        <h2>{{ errorMessage }}</h2>
+                    </ion-label>
+                </div>
+                <ion-item *ngFor="let stop of stops" class="animated fadeIn fast" (press)="stopOptions(stop.stop_id)">
+                    <ion-thumbnail slot="start" class="thumbnail-text">
+                        <img src="../../assets/img/background-1.jpg">
+                        <div class="centered">
+                            <b class="thumbnail-text-white" [routerLink]="['/tabs/micros/', stop.stop_id]">{{ stop.stop_id }}</b>
+                        </div>
+                    </ion-thumbnail>
+                    <ion-label class="ion-text-wrap" [routerLink]="['/tabs/micros/', stop.stop_id]">
+                        {{ stop.stop_name | splitter:'-' }}
+                    </ion-label>
+                </ion-item>
+            </ion-list>
+        </ion-card-content>
+    </ion-card>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button color="success">
+            <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+        <ion-fab-list side="top">
+            <ion-fab-button (click)="addNewStop()">
+                <ion-icon name="create"></ion-icon>
+            </ion-fab-button>
+            <ion-fab-button [routerLink]="['/tabs/map']">
+                <ion-icon name="pin"></ion-icon>
+            </ion-fab-button>
+        </ion-fab-list>
+    </ion-fab>
+</ion-content>

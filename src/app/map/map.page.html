@@ -1,0 +1,12 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Paraderos cercanos</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div style="text-align: center; margin-top: 10px;" *ngIf="showSpinner">
+        <ion-spinner name="lines"></ion-spinner>
+    </div>
+    <div #mapElement class="map" id="map" style="display: none;"></div>
+</ion-content>

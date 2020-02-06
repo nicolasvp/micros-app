@@ -1,0 +1,62 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons>
+            <ion-button>
+                <ion-icon slot="start" name="pin"></ion-icon>
+                Bus Stop
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+    <ion-toolbar>
+        <ion-title style="text-align: center;">
+            <h3>
+                <ion-icon name="star"></ion-icon>
+                Casa(PI587)
+            </h3>
+        </ion-title>
+    </ion-toolbar>
+    <ion-card>
+        <ion-card-content>
+            <div style="text-align: center" *ngIf="bipSpinner">
+                <ion-spinner name="lines"></ion-spinner>
+            </div>
+            <div style="text-align: center" *ngIf="bipAmount" class="animated fadeIn fast">
+                <h1>Saldo Bip</h1>
+                <h1>{{ bipAmount.saldoTarjeta }}</h1>
+                <h3>Última actualización: {{ bipAmount.fechaSaldo }}</h3>
+            </div>
+        </ion-card-content>
+    </ion-card>
+    <ion-card>
+        <ion-card-content>
+            <ion-list>
+                <div style="text-align: center" *ngIf="arrivalsSpinner">
+                    <ion-spinner name="lines"></ion-spinner>
+                </div>
+                <div style="text-align: center" *ngIf="errorPresent">
+                    <ion-label>
+                        <h2>{{ errorMessage }}</h2>
+                    </ion-label>
+                </div>
+                <ion-item *ngFor="let micro of nextArrivals" class="animated fadeIn fast">
+                    <ion-thumbnail slot="start" class="thumbnail-text" color="primary">
+                        <img src="../../assets/img/background-1.jpg">
+                        <div class="centered">
+                            <b class="max-five-letters thumbnail-text-white">{{ micro.route_id }}</b>
+                        </div>
+                    </ion-thumbnail>
+                    <ion-label class="ion-text-wrap" style="color: rgb(66, 66, 66);">
+                        <h2>{{ micro.arrival_estimation }}</h2>
+                        <h3>{{ micro.bus_distance }}</h3>
+                    </ion-label>
+                </ion-item>
+            </ion-list>
+        </ion-card-content>
+    </ion-card>
+</ion-content>
