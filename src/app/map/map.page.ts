@@ -5,6 +5,8 @@ import { MapService } from '../services/map.service';
 import { StopsService } from '../services/stops.service';
 import { NgZone } from '@angular/core';
 import { NavController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
+
 declare var google;
 
 
@@ -28,6 +30,7 @@ export class MapPage implements OnInit, AfterViewInit {
     scaledSize: new google.maps.Size(20, 20), // scaled size
   };
   showSpinner: boolean = true;
+  subcriber: Subscription;
 
   @ViewChild('mapElement', {static: false}) mapElement: ElementRef;
 
@@ -138,40 +141,59 @@ export class MapPage implements OnInit, AfterViewInit {
   * Luego setea la informacion en un cuadro HTML
   */
   buildInfoWindow() {
+    this.createInfoWindow();
     this.stopMarkers.forEach( (stop, index) => {
       stop.addListener('click', () => {
-        this.closeWindowInfo();
+        this.setSpinnerOnInfoWindow();
         const currentStop = this.stopsAround[index];
-        this.stopsService.getMicrosByStopCode(currentStop.stop_id).subscribe(
+        this.infoWindow.open(this.map, stop);
+        this.subcriber = this.stopsService.getMicrosByStopCode(currentStop.stop_id).subscribe(
           response => {
-            this.infoWindow = this.setContentToInfoWindow(response, currentStop);
-            this.infoWindow.open(this.map, stop);
-            this.infoWindow.addListener('domready', () => {
-              const element = document.getElementById('info-window-content');
-              if (element) {
-                element.addEventListener('click', () => {
-                  this.navCtrl.navigateForward(`/tabs/micros/${currentStop.stop_id}`);
-                });
-              }
-            });
+            this.setInfoWindowContent(response, currentStop, stop);
           },
           error => {
             console.log(error);
+            this.infoWindow.setContent('Error al carga info');
           }
         );
       });
     });
   }
 
-  // Setea el ancho y contenido del marker
-  setContentToInfoWindow(micros: any[], stop: Stop) {
-    return new google.maps.InfoWindow({
-      content: this.setContentMarker(micros, stop),
+  /**
+   * Crea el objeto de infoWindow con un ancho maximo de 400px
+   * Se maneja solo 1 objeto de infoWindow para mantener solo 1 activo a la vez en todo el mapa
+   */
+  createInfoWindow() {
+    this.infoWindow = new google.maps.InfoWindow({
       maxWidth: 400
     });
   }
 
-  // Retorna el HTML con la información que se muestra en el marker
+  // Setea un spinner en el windowInfo mientras se carga la info desde la API
+  setSpinnerOnInfoWindow() {
+    this.infoWindow.setContent('<ion-spinner name="lines"></ion-spinner>');
+  }
+
+  // Crea el contenido del windowInfo con el evento de click y toda la informacion
+  setInfoWindowContent(micros, currentStop, stop) {
+    this.infoWindow.setContent(this.setContentMarker(micros, currentStop));
+    this.infoWindow.open(this.map, stop);
+    this.infoWindow.addListener('domready', () => {
+      const infoWindowContent = document.getElementById('info-window-content');
+      if (infoWindowContent) {
+        infoWindowContent.addEventListener('click', () => {
+          this.navCtrl.navigateForward(`/tabs/micros/${currentStop.stop_id}`);
+        });
+      }
+    });
+    // Cancela la petición cuando se cierra el marker
+    this.infoWindow.addListener('closeclick', () => {
+      this.subcriber.unsubscribe();
+    });
+  }
+
+  // Retorna el HTML en un string con la información que se muestra en el marker
   setContentMarker(micros: any[], stop: Stop) {
     let microsBadges: string = '';
 
@@ -201,7 +223,7 @@ export class MapPage implements OnInit, AfterViewInit {
     }
   }
 
-  // Cierra el infoWindow que está abierto para abrir un nuevo(la idea es mantener solo 1 abierto a la vez)
+  // Cierra el infoWindow que está abierto
   closeWindowInfo() {
     if (this.infoWindow) {
       this.infoWindow.close();
