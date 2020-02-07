@@ -9,7 +9,6 @@ import { Subscription } from 'rxjs';
 
 declare var google;
 
-
 @Component({
   selector: 'app-map',
   templateUrl: './map.page.html',
@@ -62,6 +61,8 @@ export class MapPage implements OnInit, AfterViewInit {
     this.stopsAround = [];
     this.stopsAroundPositions = [];
     this.stopMarkers = [];
+    this.showSpinner = true;
+    document.getElementById('map').style.display = 'none';
   }
 
   ngAfterViewInit(): void {}
@@ -180,7 +181,7 @@ export class MapPage implements OnInit, AfterViewInit {
     this.infoWindow.setContent(this.setContentMarker(micros, currentStop));
     this.infoWindow.open(this.map, stop);
     this.infoWindow.addListener('domready', () => {
-      const infoWindowContent = document.getElementById('info-window-content');
+      const infoWindowContent = document.getElementById(currentStop.stop_id);
       if (infoWindowContent) {
         infoWindowContent.addEventListener('click', () => {
           this.navCtrl.navigateForward(`/tabs/micros/${currentStop.stop_id}`);
@@ -194,7 +195,7 @@ export class MapPage implements OnInit, AfterViewInit {
   }
 
   // Retorna el HTML en un string con la información que se muestra en el marker
-  setContentMarker(micros: any[], stop: Stop) {
+  setContentMarker(micros: any[], currentStop: Stop) {
     let microsBadges: string = '';
 
     // Crea los badges de las micros en forma de string
@@ -202,9 +203,9 @@ export class MapPage implements OnInit, AfterViewInit {
       microsBadges += '<ion-badge style="margin-right: 3px;">' + micro + '</ion-badge>';
     });
 
-    return '<div id="info-window-content">' +
+    return '<div id="' + currentStop.stop_id + '">' +
               '<ion-label style="font-size: 15px;">' +
-                '<strong>' + this.formatStopName(stop.stop_name) + '(' + stop.stop_id + ')' + '</strong>' +
+                '<strong>' + this.formatStopName(currentStop.stop_name) + '(' + currentStop.stop_id + ')' + '</strong>' +
               '</ion-label>' +
               '<br><br>' +
               '<ion-label style="font-size: 13px;">' + microsBadges + '</ion-label>' +

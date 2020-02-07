@@ -13,11 +13,11 @@ import { MicrosPopOverComponent } from '../component/micros-pop-over/micros-pop-
 })
 export class MicrosPage implements OnInit {
 
-  stopCode: string = null;
+  stopCode: string = '';
   micros: Micro [] = [];
   microsSpinner: boolean = true;
   errorPresent: boolean = true;
-  errorMessage: string = null;
+  errorMessage: string = '';
 
   constructor(private activatedRoute: ActivatedRoute,
               private stopService: StopsService,
@@ -35,7 +35,7 @@ export class MicrosPage implements OnInit {
   }
 
   getMicros() {
-    if (this.stopCode != null) {
+    if (this.stopCode !== '') {
       this.getMicrosInfo();
     } else {
       this.microsSpinner = false;
@@ -44,7 +44,7 @@ export class MicrosPage implements OnInit {
 
   doRefresh(event) {
     this.errorPresent = false;
-    if (this.stopCode != null) {
+    if (this.stopCode !== '') {
       this.getMicrosInfo();
     }
     event.target.complete();
@@ -57,7 +57,7 @@ export class MicrosPage implements OnInit {
         this.micros = response.results;
         this.microsSpinner = false;
         this.errorPresent = false;
-        this.errorMessage = null;
+        this.errorMessage = '';
       },
       error => {
         console.log(error);
@@ -76,7 +76,7 @@ export class MicrosPage implements OnInit {
       translucent: true,
       componentProps: {microId: microId, microFunctions: this}
     });
-    
+
     await microOptions.present();
   }
 }
