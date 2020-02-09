@@ -26,10 +26,6 @@ export class MicrosPage implements OnInit {
 
   // Se mantiene el ultimo paradero cargado para que no se pierda la ultima información
   ngOnInit() {
-    this.microsService.getMicrosByStopCode('I03', '0').subscribe(
-      response => {
-      //console.log(response);
-    });
     this.stopCode = this.activatedRoute.snapshot.paramMap.get('stopCode');
     this.getMicros();
   }
@@ -78,5 +74,19 @@ export class MicrosPage implements OnInit {
     });
 
     await microOptions.present();
+  }
+
+  getMicrosDirections(microId: string, direction: string) {
+    console.log('cargando...')
+    this.microsService.getMicrosByStopCode(microId, direction).subscribe(
+      response => {
+      console.log(response);
+    });
+    this.dismissPopOver();
+  }
+
+  // Cierra ventana(popover) con las opciones del paradero
+  async dismissPopOver() {
+    await this.popoverController.dismiss();
   }
 }

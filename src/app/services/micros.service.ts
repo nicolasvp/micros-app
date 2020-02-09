@@ -16,8 +16,7 @@ export class MicrosService {
     return this.http.get(`https://api.scltrans.it/v1/routes/${microId}/directions/${direction}`)
     .pipe(
       map((response: any) => {
-        let stops = response.results.stop_times;
-        console.log(stops[0].stop);
+        return response.results.stop_times;
       }),
       catchError(e => throwError(e))
     );

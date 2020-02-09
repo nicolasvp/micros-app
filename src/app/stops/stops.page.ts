@@ -34,7 +34,7 @@ export class StopsPage {
   // Agrega el paradero como favorito
   addAsFavorite(stopId: string) {
     console.log('Adding stop as favorite');
-    this.dismissStopOptions();
+    this.dismissPopOver();
   }
 
   // Despliega una ventana(popover) con opciones para el paradero
@@ -110,7 +110,7 @@ export class StopsPage {
             const index = this.stops.findIndex(x => x.stop_id === stopCode);
             if (index !== undefined) {
               this.stops.splice(index, 1);
-              this.dismissStopOptions();
+              this.dismissPopOver();
             }
             console.log('Confirm Okay');
           }
@@ -171,7 +171,7 @@ export class StopsPage {
   }
 
   // Cierra ventana(popover) con las opciones del paradero
-  async dismissStopOptions() {
+  async dismissPopOver() {
     await this.popoverController.dismiss();
   }
 }

@@ -40,8 +40,8 @@ export class MicrosPopOverComponent implements OnInit {
 
   ngOnInit() {}
 
-  getRoute(microId: string) {
-    console.log(microId)
-    //this.navParams.data.microFunctions.getRoute(microId);
+  getRoute(direction: string) {
+    console.log(this.microId)
+    this.navParams.data.microFunctions.getMicrosDirections(this.microId, direction);
   }
 }
