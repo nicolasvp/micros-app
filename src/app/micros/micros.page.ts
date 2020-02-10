@@ -48,7 +48,7 @@ export class MicrosPage implements OnInit {
 
   getMicrosInfo() {
     this.microsSpinner = true;
-    this.stopService.getNextArrivalsFromStop(this.stopCode).subscribe(
+    this.stopService.getNextArrivals(this.stopCode).subscribe(
       response => {
         this.micros = response.results;
         this.microsSpinner = false;
@@ -64,21 +64,21 @@ export class MicrosPage implements OnInit {
     );
   }
 
-  async microOptions(microId: any, direction: string) {
+  async microOptions(microCode: any, direction: string) {
 
     const microOptions = await this.popoverController.create({
       component: MicrosPopOverComponent,
-      event: microId,
+      event: microCode,
       translucent: true,
-      componentProps: {microId: microId, microFunctions: this}
+      componentProps: {microCode: microCode, microFunctions: this}
     });
 
     await microOptions.present();
   }
 
-  getMicrosDirections(microId: string, direction: string) {
+  getMicrosDirections(microCode: string, direction: string) {
     console.log('cargando...')
-    this.microsService.getMicrosByStopCode(microId, direction).subscribe(
+    this.microsService.getMicroRouteByDirection(microCode, direction).subscribe(
       response => {
       console.log(response);
     });

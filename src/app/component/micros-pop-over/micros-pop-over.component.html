@@ -1,16 +1,16 @@
 <ion-list>
-  <ion-list-header>
-      <strong>Mostrar recorrido {{ microId }}</strong>
-  </ion-list-header>
-  <div style="text-align: center" *ngIf="microSpinner">
-    <ion-spinner name="lines"></ion-spinner>
-  </div>
-  <div *ngIf="!microSpinner">
-    <ion-item (click)="getRoute(outbound.direction)">
-        <ion-label><strong>Hacia</strong>: {{ outbound.headSign }}</ion-label>
-    </ion-item>
-    <ion-item (click)="getRoute(inbound.direction)">
-        <ion-label><strong>Hacia</strong>: {{ inbound.headSign }}</ion-label>
-    </ion-item>
-  </div>
+    <ion-list-header>
+        <strong>Mostrar recorrido {{ microCode }}</strong>
+    </ion-list-header>
+    <div style="text-align: center" *ngIf="microSpinner">
+        <ion-spinner name="lines"></ion-spinner>
+    </div>
+    <div *ngIf="!microSpinner">
+        <ion-item (click)="getRoute(outbound.direction)">
+            <ion-label><strong>Hacia</strong>: {{ outbound.headSign }}</ion-label>
+        </ion-item>
+        <ion-item (click)="getRoute(inbound.direction)">
+            <ion-label><strong>Hacia</strong>: {{ inbound.headSign }}</ion-label>
+        </ion-item>
+    </div>
 </ion-list>

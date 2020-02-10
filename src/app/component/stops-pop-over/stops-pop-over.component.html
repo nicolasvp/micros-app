@@ -1,14 +1,14 @@
 <ion-list>
     <ion-list-header>
-        <strong>Paradero {{ stopId }}</strong>
+        <strong>Paradero {{ stopCode }}</strong>
     </ion-list-header>
-    <ion-item (click)="favStop(stopId)">
+    <ion-item (click)="favStop(stopCode)">
         <ion-label>Favorito</ion-label>
         <ion-note slot="end">
             <ion-icon name="star" style="font-size: 15px;"></ion-icon>
         </ion-note>
     </ion-item>
-    <ion-item (click)="deleteStop(stopId)">
+    <ion-item (click)="deleteStop(stopCode)">
         <ion-label>Eliminar</ion-label>
         <ion-note slot="end">
             <ion-icon name="trash" style="font-size: 15px;"></ion-icon>

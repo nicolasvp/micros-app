@@ -8,7 +8,7 @@ import { MicrosService } from '../../services/micros.service';
 })
 export class MicrosPopOverComponent implements OnInit {
 
-  microId: string = '';
+  microCode: string = '';
   outbound = {
     direction: '',
     headSign: ''
@@ -20,11 +20,11 @@ export class MicrosPopOverComponent implements OnInit {
   microSpinner = true;
 
   constructor(private navParams: NavParams, private microsService: MicrosService) {
-    this.microId = this.navParams.get('microId');
+    this.microCode = this.navParams.get('microCode');
   }
 
   ionViewWillEnter() {
-    this.microsService.getDirectionsByMicroId(this.microId).subscribe(
+    this.microsService.getAllMicroRoutes(this.microCode).subscribe(
       response => {
         this.outbound.headSign = response[0] ? response[0].direction_headsign : '';
         this.outbound.direction = response[0] ? response[0].direction_id : '';
@@ -41,7 +41,7 @@ export class MicrosPopOverComponent implements OnInit {
   ngOnInit() {}
 
   getRoute(direction: string) {
-    console.log(this.microId)
-    this.navParams.data.microFunctions.getMicrosDirections(this.microId, direction);
+    console.log(this.microCode)
+    this.navParams.data.microFunctions.getMicrosDirections(this.microCode, direction);
   }
 }

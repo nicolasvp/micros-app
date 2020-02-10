@@ -37,7 +37,7 @@ export class StartPage implements OnInit {
   }
 
   getStopInfo() {
-    this.stopService.getNextArrivalsFromStop('PI587').subscribe(
+    this.stopService.getNextArrivals('PI587').subscribe(
       response => {
         this.nextArrivals.push(...response.results);
         this.arrivalsSpinner = false;

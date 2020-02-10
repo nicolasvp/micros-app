@@ -10,10 +10,10 @@ export class MicrosService {
 
   constructor(private http: HttpClient) { }
 
-  // Obtiene todos los paraderos del recorrido de la micro de ida o vuelta
-  getMicrosByStopCode(microId: string, direction: string) {
-    const stops: any[] = [];
-    return this.http.get(`https://api.scltrans.it/v1/routes/${microId}/directions/${direction}`)
+  // Obtiene la ruta de una micro segun la direction(ida o vuelta) que se le pase (0 o 1)
+  // microCode => "numero" de la micro Ej: I03
+  getMicroRouteByDirection(microCode: string, directionId: string) {
+    return this.http.get(`https://api.scltrans.it/v2/routes/${microCode}/directions/${directionId}`)
     .pipe(
       map((response: any) => {
         return response.results.stop_times;
@@ -22,9 +22,10 @@ export class MicrosService {
     );
   }
 
-  // Obtiene informacion del recorrido de la micro(el origen y el destino)
-  getDirectionsByMicroId(microId: string) {
-    return this.http.get(`https://api.scltrans.it/v1/routes/${microId}`)
+  // Obtiene la ruta de una micro de ida y de vuelta segun el "numero" de la micro
+  // Ej: I03, este endpoint se demora más de los normal, 1 a 6 segundos
+  getAllMicroRoutes(microCode: string) {
+    return this.http.get(`https://api.scltrans.it/v2/routes/${microCode}/directions`)
     .pipe(
       map((response: any) => {
         //console.log(response.directions);

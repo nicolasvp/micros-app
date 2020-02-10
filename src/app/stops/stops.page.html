@@ -26,14 +26,14 @@
                         <h2>{{ errorMessage }}</h2>
                     </ion-label>
                 </div>
-                <ion-item *ngFor="let stop of stops" class="animated fadeIn fast" (press)="stopOptions(stop.stop_id)">
+                <ion-item *ngFor="let stop of stops" class="animated fadeIn fast" (press)="stopOptions(stop.stop_code)">
                     <ion-thumbnail slot="start" class="thumbnail-text">
                         <img src="../../assets/img/background-1.jpg">
                         <div class="centered">
-                            <b class="thumbnail-text-white" [routerLink]="['/tabs/micros/', stop.stop_id]">{{ stop.stop_id }}</b>
+                            <b class="thumbnail-text-white" [routerLink]="['/tabs/micros/', stop.stop_code]">{{ stop.stop_code }}</b>
                         </div>
                     </ion-thumbnail>
-                    <ion-label class="ion-text-wrap" [routerLink]="['/tabs/micros/', stop.stop_id]">
+                    <ion-label class="ion-text-wrap" [routerLink]="['/tabs/micros/', stop.stop_code]">
                         {{ stop.stop_name | splitter:'-' }}
                     </ion-label>
                 </ion-item>

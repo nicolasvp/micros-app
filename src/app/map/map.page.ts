@@ -148,7 +148,7 @@ export class MapPage implements OnInit, AfterViewInit {
         this.setSpinnerOnInfoWindow();
         const currentStop = this.stopsAround[index];
         this.infoWindow.open(this.map, stop);
-        this.subcriber = this.stopsService.getMicrosByStopCode(currentStop.stop_id).subscribe(
+        this.subcriber = this.stopsService.getMicros(currentStop.stop_id).subscribe(
           response => {
             this.setInfoWindowContent(response, currentStop, stop);
           },

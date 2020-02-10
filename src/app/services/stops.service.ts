@@ -12,9 +12,9 @@ export class StopsService {
 
   constructor(private http: HttpClient) { }
 
-  // Obtiene la lista de micros de un paradero segun el code(stop_id)
-  getNextArrivalsFromStop(code: string) {
-    return this.http.get<NextArrivals>(`https://api.scltrans.it/v2/stops/${code}/next_arrivals`)
+  // Obtiene la lista de micros de un paradero segun el stop code
+  getNextArrivals(stopCode: string) {
+    return this.http.get<NextArrivals>(`https://api.scltrans.it/v2/stops/${stopCode}/next_arrivals`)
     .pipe(
       map( (response: any) => {
         response.results.forEach(arrival => {
@@ -29,29 +29,31 @@ export class StopsService {
     );
   }
 
-  // Obtiene la información del paradero segun el code(stop_id)
-  getStopInfoByCode(code: string) {
-    return this.http.get<Stop>(`https://api.scltrans.it/v1/stops/${code}`)
+  // Obtiene la información del paradero segun el stop code
+  getStopInfo(stopCode: string) {
+    return this.http.get<Stop>(`https://api.scltrans.it/v1/stops/${stopCode}`)
     .pipe(
       catchError(e => throwError(e))
     );
   }
 
+  // Reajusta la distancia que muestra la API, le disminuye 500 metros
   reCalculateDistance(busDistance: number) {
     const tempDistance = busDistance - 500;
     return tempDistance > 0 ? tempDistance + ' m.' : null;
   }
 
+  // Cambia el mensaje por uno más abreviado
   editMessage(message: string) {
     return message === 'Servicio fuera de horario de operacion para ese paradero' ?
     'Servicio fuera de horario.' :
     message;
   }
 
-  // Obtiene la lista de los recorridos para un paradero
-  getMicrosByStopCode(code: string) {
+  // Obtiene la lista de los recorridos para un paradero segun el stop code
+  getMicros(stopCode: string) {
     const stops: any[] = [];
-    return this.http.get<Stop>(`https://api.scltrans.it/v3/stops/${code}/stop_routes`)
+    return this.http.get<Stop>(`https://api.scltrans.it/v3/stops/${stopCode}/stop_routes`)
     .pipe(
       map((response: any) => {
         response.results.forEach( stop => {

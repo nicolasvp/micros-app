@@ -14,15 +14,15 @@ import { StopsPopOverComponent } from '../component/stops-pop-over/stops-pop-ove
 export class StopsPage {
 
   stops: Stop[] = [
-    {'stop_id': 'PI115','stop_name': 'PI115 - Parada 4 / (M) San Alberto Hurtado'},
-    {'stop_id': 'PA187','stop_name': 'PA187 - Parada 1 / (M) República'},
-    {'stop_id': 'PI423','stop_name': 'PI423 - Parada 1 / Vicente Reyes - Pajaritos'}
+    {'stop_code': 'PI115','stop_name': 'PI115 - Parada 4 / (M) San Alberto Hurtado'},
+    {'stop_code': 'PA187','stop_name': 'PA187 - Parada 1 / (M) República'},
+    {'stop_code': 'PI423','stop_name': 'PI423 - Parada 1 / Vicente Reyes - Pajaritos'}
   ];
 
   stopsSpinner: boolean = false;
   errorPresent: boolean = false;
-  errorMessage: string = null;
-  stopCode: string = null;
+  errorMessage: string = '';
+  stopCode: string = '';
 
   constructor(public modalController: ModalController,
               private stopsService: StopsService,
@@ -32,18 +32,18 @@ export class StopsPage {
               }
 
   // Agrega el paradero como favorito
-  addAsFavorite(stopId: string) {
+  addAsFavorite(stopCode: string) {
     console.log('Adding stop as favorite');
     this.dismissPopOver();
   }
 
   // Despliega una ventana(popover) con opciones para el paradero
-  async stopOptions(ev: any) {
+  async stopOptions(stopCode: any) {
     const stopOptions = await this.popoverController.create({
       component: StopsPopOverComponent,
-      event: ev,
+      event: stopCode,
       translucent: true,
-      componentProps: {stopId: ev, stopFunctions: this}
+      componentProps: {stopCode: stopCode, stopFunctions: this}
     });
 
     return await stopOptions.present();
@@ -92,7 +92,7 @@ export class StopsPage {
       this.stopCode = typeof(data.data) !== 'undefined' ? data.data.values.stopCode.trim() : null;
       const role = data.role;
 
-      if (role === 'accept' && this.stopCode != null && this.stopCode !== '') {
+      if (role === 'accept' && this.stopCode !== '') {
         this.getStopInfo(this.stopCode);
       }
     });
@@ -107,7 +107,7 @@ export class StopsPage {
         {
           text: 'Aceptar',
           handler: () => {
-            const index = this.stops.findIndex(x => x.stop_id === stopCode);
+            const index = this.stops.findIndex(x => x.stop_code === stopCode);
             if (index !== undefined) {
               this.stops.splice(index, 1);
               this.dismissPopOver();
@@ -140,7 +140,7 @@ export class StopsPage {
   checkStopInList(stopCode: string): boolean {
     let isPresent = false;
     this.stops.forEach( value => {
-      if (value.stop_id === stopCode.toUpperCase()) {
+      if (value.stop_code === stopCode.toUpperCase()) {
         isPresent = true;
       }
     });
@@ -150,7 +150,7 @@ export class StopsPage {
   // Realiza la llamada al servicio de Stops para obtener los paraderos
   stopInfoCall(stopCode: string) {
     this.stopsSpinner = true;
-    this.stopsService.getStopInfoByCode(stopCode.toUpperCase()).subscribe(
+    this.stopsService.getStopInfo(stopCode.toUpperCase()).subscribe(
       response => {
         this.stops.push(response);
         this.stopsSpinner = false;

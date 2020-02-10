@@ -8,19 +8,19 @@ import { NavParams } from '@ionic/angular';
 })
 export class StopsPopOverComponent implements OnInit {
 
-  stopId = null;
+  stopCode = null;
 
   constructor(public navParams: NavParams) {
-    this.stopId = this.navParams.get('stopId');
+    this.stopCode = this.navParams.get('stopCode');
   }
 
   ngOnInit() {}
 
-  favStop(stopId: string) {
-    this.navParams.data.stopFunctions.addAsFavorite(stopId);
+  favStop(stopCode: string) {
+    this.navParams.data.stopFunctions.addAsFavorite(stopCode);
   }
 
-  deleteStop(stopId: string) {
-    this.navParams.data.stopFunctions.deleteStop(stopId);
+  deleteStop(stopCode: string) {
+    this.navParams.data.stopFunctions.deleteStop(stopCode);
   }
 }
