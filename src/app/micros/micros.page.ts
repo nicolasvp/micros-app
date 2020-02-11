@@ -5,6 +5,7 @@ import { StopsService } from '../services/stops.service';
 import { MicrosService } from '../services/micros.service';
 import { PopoverController } from '@ionic/angular';
 import { MicrosPopOverComponent } from '../component/micros-pop-over/micros-pop-over.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-micros',
@@ -18,7 +19,8 @@ export class MicrosPage implements OnInit {
   microsSpinner: boolean = true;
   errorPresent: boolean = true;
   errorMessage: string = '';
-
+  subcriber: Subscription = null;
+  
   constructor(private activatedRoute: ActivatedRoute,
               private stopService: StopsService,
               private microsService: MicrosService,
@@ -30,8 +32,22 @@ export class MicrosPage implements OnInit {
     this.getMicros();
   }
 
+  // Recarga el resultado de las micros que vienen al paradero cuando se vuelve a entrar a la pagina
+  ionViewWillEnter() {
+    this.stopCode = this.activatedRoute.snapshot.paramMap.get('stopCode');
+    this.getMicros();
+  }
+
+  ionViewDidLeave() {
+    if(this.subcriber !== null) {
+      this.subcriber.unsubscribe();
+    }
+    this.microsSpinner = false;
+    this.micros = [];
+  }
+
   getMicros() {
-    if (this.stopCode !== '') {
+    if (this.stopCode !== null) {
       this.getMicrosInfo();
     } else {
       this.microsSpinner = false;
@@ -48,7 +64,7 @@ export class MicrosPage implements OnInit {
 
   getMicrosInfo() {
     this.microsSpinner = true;
-    this.stopService.getNextArrivals(this.stopCode).subscribe(
+    this.subcriber = this.stopService.getNextArrivals(this.stopCode).subscribe(
       response => {
         this.micros = response.results;
         this.microsSpinner = false;

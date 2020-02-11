@@ -27,7 +27,7 @@ export class StopsPage {
   constructor(public modalController: ModalController,
               private stopsService: StopsService,
               public alertController: AlertController,
-              private database: DatabaseService,
+             // private database: DatabaseService,
               public popoverController: PopoverController) {
               }
 
