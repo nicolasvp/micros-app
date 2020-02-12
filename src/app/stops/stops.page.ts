@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ModalController, AlertController, PopoverController } from '@ionic/angular';
+import { AlertController, PopoverController } from '@ionic/angular';
 import { StopsService } from '../services/stops.service';
 import { Stop } from '../interfaces/stop';
 import { DatabaseService } from '../services/database.service';
@@ -24,16 +24,15 @@ export class StopsPage {
   errorMessage: string = '';
   stopCode: string = '';
 
-  constructor(public modalController: ModalController,
-              private stopsService: StopsService,
-              public alertController: AlertController,
-             // private database: DatabaseService,
-              public popoverController: PopoverController) {
+  constructor(private stopsService: StopsService,
+              private alertController: AlertController,
+              private databaseService: DatabaseService,
+              private popoverController: PopoverController) {
               }
 
   // Agrega el paradero como favorito
-  addAsFavorite(stopCode: string) {
-    console.log('Adding stop as favorite');
+  addStopAsFavorite(stopCode: string) {
+    this.databaseService.setFavoriteStopCode(stopCode);
     this.dismissPopOver();
   }
 

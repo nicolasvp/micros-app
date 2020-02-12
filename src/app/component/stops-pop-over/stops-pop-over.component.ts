@@ -17,7 +17,7 @@ export class StopsPopOverComponent implements OnInit {
   ngOnInit() {}
 
   favStop(stopCode: string) {
-    this.navParams.data.stopFunctions.addAsFavorite(stopCode);
+    this.navParams.data.stopFunctions.addStopAsFavorite(stopCode);
   }
 
   deleteStop(stopCode: string) {

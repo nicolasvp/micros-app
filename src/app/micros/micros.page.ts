@@ -20,7 +20,7 @@ export class MicrosPage implements OnInit {
   errorPresent: boolean = true;
   errorMessage: string = '';
   subcriber: Subscription = null;
-  
+
   constructor(private activatedRoute: ActivatedRoute,
               private stopService: StopsService,
               private microsService: MicrosService,
@@ -29,7 +29,6 @@ export class MicrosPage implements OnInit {
   // Se mantiene el ultimo paradero cargado para que no se pierda la ultima información
   ngOnInit() {
     this.stopCode = this.activatedRoute.snapshot.paramMap.get('stopCode');
-    this.getMicros();
   }
 
   // Recarga el resultado de las micros que vienen al paradero cuando se vuelve a entrar a la pagina
@@ -39,7 +38,7 @@ export class MicrosPage implements OnInit {
   }
 
   ionViewDidLeave() {
-    if(this.subcriber !== null) {
+    if (this.subcriber !== null) {
       this.subcriber.unsubscribe();
     }
     this.microsSpinner = false;
@@ -62,6 +61,7 @@ export class MicrosPage implements OnInit {
     event.target.complete();
   }
 
+  // Obtiene el tiempo en que llegaran las proximas micros
   getMicrosInfo() {
     this.microsSpinner = true;
     this.subcriber = this.stopService.getNextArrivals(this.stopCode).subscribe(
@@ -81,7 +81,6 @@ export class MicrosPage implements OnInit {
   }
 
   async microOptions(microCode: any, direction: string) {
-
     const microOptions = await this.popoverController.create({
       component: MicrosPopOverComponent,
       event: microCode,
