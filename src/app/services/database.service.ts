@@ -14,6 +14,7 @@ export class DatabaseService {
   FAVORITE_STOP_NAME: string = 'stop_name';
 
   constructor(private storage: Storage) {
+    this.storage.set(this.FAVORITE_STOP_NAME, 'Paradero');
     this.storage.set(this.FAVORITE_STOP_CODE, 'PI587');
   }
 
@@ -32,5 +33,9 @@ export class DatabaseService {
         return value;
       }
     );
+  }
+
+  removeValueFromDB(key: string) {
+    this.storage.remove(key);
   }
 }

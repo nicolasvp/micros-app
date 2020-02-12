@@ -1,9 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { AlertController, PopoverController } from '@ionic/angular';
 import { StopsService } from '../services/stops.service';
 import { Stop } from '../interfaces/stop';
 import { DatabaseService } from '../services/database.service';
-import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 import { StopsPopOverComponent } from '../component/stops-pop-over/stops-pop-over.component';
 
 @Component({
@@ -24,15 +23,22 @@ export class StopsPage {
   errorMessage: string = '';
   stopCode: string = '';
 
+  @ViewChild('fabGroup', {static: false}) fabGroup;
+
   constructor(private stopsService: StopsService,
               private alertController: AlertController,
               private databaseService: DatabaseService,
               private popoverController: PopoverController) {
               }
+  ionViewDidLeave() {
+    // Cierra el fab group cuando sale de la pagina
+    this.fabGroup.close();
+  }
 
-  // Agrega el paradero como favorito
+  // Agrega el paradero como favorito, seteando el stop_code y removiendo el stop_name
   addStopAsFavorite(stopCode: string) {
     this.databaseService.setFavoriteStopCode(stopCode);
+    this.databaseService.removeValueFromDB('stop_name');
     this.dismissPopOver();
   }
 

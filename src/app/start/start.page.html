@@ -13,11 +13,12 @@
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
     </ion-refresher>
-    <ion-toolbar (press)="addFavoriteStopName()">
+    <ion-toolbar (click)="addFavoriteStopName()">
         <ion-title style="text-align: center;">
             <h3>
-                <ion-icon name="star"></ion-icon>
+                <!--ion-icon name="star"></ion-icon-->
                 {{ this.favoriteStop.name }}({{ this.favoriteStop.code }})
+                <ion-icon name="create" style="font-size: 17px;"></ion-icon>
             </h3>
         </ion-title>
     </ion-toolbar>

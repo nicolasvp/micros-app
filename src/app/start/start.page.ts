@@ -91,7 +91,7 @@ export class StartPage implements OnInit {
   // Despliega ventana(alert) para setear un nombre custom para el paradero favorito
   async addFavoriteStopName() {
     const startAlert = await this.alertController.create({
-      header: 'Ingrese nombre',
+      header: 'Nombre personalizado',
       inputs: [
         {
           id: 'stopName',
