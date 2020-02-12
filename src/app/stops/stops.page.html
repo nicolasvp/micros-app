@@ -12,7 +12,7 @@
 <ion-content>
     <ion-toolbar>
         <ion-title style="text-align: center;">
-            <h3>Paraderos</h3>
+            <h3>Paraderos recientes</h3>
         </ion-title>
     </ion-toolbar>
     <ion-card>
@@ -26,7 +26,7 @@
                         <h2>{{ errorMessage }}</h2>
                     </ion-label>
                 </div>
-                <ion-item *ngFor="let stop of stops" class="animated fadeIn fast" (press)="stopOptions(stop.stop_code)">
+                <ion-item *ngFor="let stop of stops.slice().reverse()" class="animated fadeIn fast" (press)="stopOptions(stop.stop_code)">
                     <ion-thumbnail slot="start" class="thumbnail-text">
                         <img src="../../assets/img/background-1.jpg">
                         <div class="centered">

@@ -17,7 +17,7 @@
         <ion-title style="text-align: center;">
             <h3>
                 <!--ion-icon name="star"></ion-icon-->
-                {{ this.favoriteStop.name }}({{ this.favoriteStop.code }})
+                {{ this.favoriteStop.name ? this.favoriteStop.name : 'Paradero' }}({{ this.favoriteStop.code }})
                 <ion-icon name="create" style="font-size: 17px;"></ion-icon>
             </h3>
         </ion-title>

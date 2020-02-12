@@ -8,7 +8,7 @@ import { throwError } from 'rxjs';
 })
 export class MapService {
 
-  RADIUS = 400;
+  RADIUS = 1000;
 
   constructor(private http: HttpClient) { }
 

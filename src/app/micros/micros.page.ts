@@ -6,6 +6,8 @@ import { MicrosService } from '../services/micros.service';
 import { PopoverController } from '@ionic/angular';
 import { MicrosPopOverComponent } from '../component/micros-pop-over/micros-pop-over.component';
 import { Subscription } from 'rxjs';
+import { DatabaseService } from '../services/database.service';
+import { Stop } from '../interfaces/stop';
 
 @Component({
   selector: 'app-micros',
@@ -24,7 +26,8 @@ export class MicrosPage implements OnInit {
   constructor(private activatedRoute: ActivatedRoute,
               private stopService: StopsService,
               private microsService: MicrosService,
-              public popoverController: PopoverController) {}
+              public popoverController: PopoverController,
+              private databaseService: DatabaseService) {}
 
   // Se mantiene el ultimo paradero cargado para que no se pierda la ultima información
   ngOnInit() {
@@ -35,6 +38,7 @@ export class MicrosPage implements OnInit {
   ionViewWillEnter() {
     this.stopCode = this.activatedRoute.snapshot.paramMap.get('stopCode');
     this.getMicros();
+    this.addStopToDB();
   }
 
   ionViewDidLeave() {
@@ -43,6 +47,30 @@ export class MicrosPage implements OnInit {
     }
     this.microsSpinner = false;
     this.micros = [];
+  }
+
+  async addStopToDB() {
+    if (this.stopCode !== null) {
+      const stopsList = await this.getInfoFromDB('stops_list');
+      if (!this.checkStopInList(stopsList)) {
+        this.databaseService.addStopWithStopCode(this.stopCode);
+      }
+    }
+  }
+
+  // Válida si el paradero ya está en la lista, si lo está no hace nada
+  checkStopInList(stops: Stop[]): boolean {
+    let isPresent = false;
+    stops.forEach( value => {
+      if (value.stop_code === this.stopCode.toUpperCase()) {
+        isPresent = true;
+      }
+    });
+    return isPresent;
+  }
+
+  async getInfoFromDB(key: string) {
+    return await this.databaseService.getValueFromDB(key);
   }
 
   getMicros() {

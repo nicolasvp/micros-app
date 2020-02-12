@@ -12,12 +12,7 @@ import { StopsPopOverComponent } from '../component/stops-pop-over/stops-pop-ove
 })
 export class StopsPage {
 
-  stops: Stop[] = [
-    {'stop_code': 'PI115','stop_name': 'PI115 - Parada 4 / (M) San Alberto Hurtado'},
-    {'stop_code': 'PA187','stop_name': 'PA187 - Parada 1 / (M) República'},
-    {'stop_code': 'PI423','stop_name': 'PI423 - Parada 1 / Vicente Reyes - Pajaritos'}
-  ];
-
+  stops: Stop[] = [];
   stopsSpinner: boolean = false;
   errorPresent: boolean = false;
   errorMessage: string = '';
@@ -30,9 +25,18 @@ export class StopsPage {
               private databaseService: DatabaseService,
               private popoverController: PopoverController) {
               }
+
+  ionViewWillEnter() {
+    this.getRecentStops();
+  }
+
   ionViewDidLeave() {
     // Cierra el fab group cuando sale de la pagina
     this.fabGroup.close();
+  }
+
+  async getRecentStops() {
+    this.stops = await this.databaseService.getValueFromDB('stops_list');
   }
 
   // Agrega el paradero como favorito, seteando el stop_code y removiendo el stop_name
@@ -111,13 +115,10 @@ export class StopsPage {
       buttons: [
         {
           text: 'Aceptar',
-          handler: () => {
-            const index = this.stops.findIndex(x => x.stop_code === stopCode);
-            if (index !== undefined) {
-              this.stops.splice(index, 1);
-              this.dismissPopOver();
-            }
-            console.log('Confirm Okay');
+          handler: async () => {
+            await this.databaseService.removeStopFromList(stopCode);
+            this.getRecentStops();
+            this.dismissPopOver();
           }
         },
         {
@@ -156,8 +157,9 @@ export class StopsPage {
   stopInfoCall(stopCode: string) {
     this.stopsSpinner = true;
     this.stopsService.getStopInfo(stopCode.toUpperCase()).subscribe(
-      response => {
-        this.stops.push(response);
+      async response => {
+        await this.databaseService.addStopWithObject(response);
+        this.getRecentStops();
         this.stopsSpinner = false;
         this.errorPresent = false;
         this.errorMessage = null;
