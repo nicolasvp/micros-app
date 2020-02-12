@@ -3,6 +3,7 @@ import { StopsService } from '../services/stops.service';
 import { Stop } from '../interfaces/stop';
 import { Bip } from '../interfaces/bip';
 import { BipService } from '../services/bip.service';
+import { DatabaseService } from '../services/database.service';
 
 @Component({
   selector: 'app-start',
@@ -18,10 +19,9 @@ export class StartPage implements OnInit {
   errorPresent: boolean = false;
   errorMessage: string = '';
 
-  constructor(private stopService: StopsService, private bipService: BipService) {}
+  constructor(private stopService: StopsService, private bipService: BipService, private databaseService: DatabaseService) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ionViewWillEnter() {
     this.getStopInfo();
@@ -36,8 +36,9 @@ export class StartPage implements OnInit {
     this.errorPresent = false;
   }
 
-  getStopInfo() {
-    this.stopService.getNextArrivals('PI587').subscribe(
+  async getStopInfo() {
+    const favoriteStop = await this.getFavStop();
+    this.stopService.getNextArrivals(favoriteStop).subscribe(
       response => {
         this.nextArrivals.push(...response.results);
         this.arrivalsSpinner = false;
@@ -68,5 +69,11 @@ export class StartPage implements OnInit {
     this.getStopInfo();
     this.getBipInfo();
     event.target.complete();
+    this.getFavStop();
+  }
+
+  // Obtiene el paradero favorito guardado
+  async getFavStop() {
+    return await this.databaseService.getFavoriteStop();
   }
 }

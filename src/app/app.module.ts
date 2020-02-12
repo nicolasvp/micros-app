@@ -16,6 +16,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { StopsPopOverComponent } from './component/stops-pop-over/stops-pop-over.component';
 import { MicrosPopOverComponent } from './component/micros-pop-over/micros-pop-over.component';
 import { IonicGestureConfig } from './ionic-gesture-config';
+import { IonicStorageModule } from '@ionic/storage';
 
 @NgModule({
   declarations: [AppComponent, StopsPopOverComponent, MicrosPopOverComponent],
@@ -23,6 +24,7 @@ import { IonicGestureConfig } from './ionic-gesture-config';
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
+    IonicStorageModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
     FormsModule
