@@ -13,36 +13,50 @@
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
     </ion-refresher>
+    <ion-card>
+        <ion-card-content>
+            <div style="text-align: center" *ngIf="bipSpinner">
+                <ion-spinner name="lines"></ion-spinner>
+            </div>
+            <div style="text-align: center" *ngIf="bipErrorPresent" (click)="addBipCard()">
+                <ion-label>
+                    <h2>
+                        {{ bipErrorMessage }}
+                        <ion-icon name="create" style="font-size: 17px;"></ion-icon>
+                    </h2>
+                </ion-label>
+            </div>
+            <div style="text-align: center" *ngIf="bipInfo" class="animated fadeIn fast" (click)="addBipCard()">
+                <h1>
+                    Saldo Bip
+                    <ion-icon name="create" style="font-size: 17px;"></ion-icon>
+                </h1>
+                <h1>{{ bipInfo.saldoTarjeta }}</h1>
+                <h3>Última actualización: {{ bipInfo.fechaSaldo }}</h3>
+                <h3>Número de tarjeta: {{ bipInfo.id }}</h3>
+                <h3>Estado de tarjeta: {{ bipInfo.estadoContrato }}</h3>
+            </div>
+        </ion-card-content>
+    </ion-card>
     <ion-toolbar (click)="addFavoriteStopName()">
         <ion-title style="text-align: center;">
             <h3>
-                <!--ion-icon name="star"></ion-icon-->
-                {{ this.favoriteStop.name ? this.favoriteStop.name : 'Paradero' }}({{ this.favoriteStop.code }})
+                <ion-icon name="star"></ion-icon>
+                {{ this.favoriteStop.name ? this.favoriteStop.name : 'Paradero favorito' }}
+                {{ this.favoriteStop.code ? (this.favoriteStop.code) : '' }}
                 <ion-icon name="create" style="font-size: 17px;"></ion-icon>
             </h3>
         </ion-title>
     </ion-toolbar>
     <ion-card>
         <ion-card-content>
-            <div style="text-align: center" *ngIf="bipSpinner">
-                <ion-spinner name="lines"></ion-spinner>
-            </div>
-            <div style="text-align: center" *ngIf="bipAmount" class="animated fadeIn fast">
-                <h1>Saldo Bip</h1>
-                <h1>{{ bipAmount.saldoTarjeta }}</h1>
-                <h3>Última actualización: {{ bipAmount.fechaSaldo }}</h3>
-            </div>
-        </ion-card-content>
-    </ion-card>
-    <ion-card>
-        <ion-card-content>
             <ion-list>
-                <div style="text-align: center" *ngIf="arrivalsSpinner">
+                <div style="text-align: center" *ngIf="stopSpinner">
                     <ion-spinner name="lines"></ion-spinner>
                 </div>
-                <div style="text-align: center" *ngIf="errorPresent">
+                <div style="text-align: center" *ngIf="stopErrorPresent">
                     <ion-label>
-                        <h2>{{ errorMessage }}</h2>
+                        <h2>{{ stopErrorMessage }}</h2>
                     </ion-label>
                 </div>
                 <ion-item *ngFor="let micro of nextArrivals" class="animated fadeIn fast">

@@ -61,11 +61,13 @@ export class MicrosPage implements OnInit {
   // Válida si el paradero ya está en la lista, si lo está no hace nada
   checkStopInList(stops: Stop[]): boolean {
     let isPresent = false;
-    stops.forEach( value => {
-      if (value.stop_code === this.stopCode.toUpperCase()) {
-        isPresent = true;
-      }
-    });
+    if (stops !== null) {
+      stops.forEach( value => {
+        if (value.stop_code === this.stopCode.toUpperCase()) {
+          isPresent = true;
+        }
+      });
+    }
     return isPresent;
   }
 

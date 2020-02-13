@@ -145,11 +145,13 @@ export class StopsPage {
   // Válida si el paradero ya está en la lista, si lo está no hace nada
   checkStopInList(stopCode: string): boolean {
     let isPresent = false;
-    this.stops.forEach( value => {
-      if (value.stop_code === stopCode.toUpperCase()) {
-        isPresent = true;
-      }
-    });
+    if (this.stops !== null) {
+      this.stops.forEach( value => {
+        if (value.stop_code === stopCode.toUpperCase()) {
+          isPresent = true;
+        }
+      });
+    }
     return isPresent;
   }
 

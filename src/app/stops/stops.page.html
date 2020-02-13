@@ -17,7 +17,7 @@
     </ion-toolbar>
     <ion-card>
         <ion-card-content>
-            <ion-list>
+            <ion-list *ngIf="stops !== null">
                 <div style="text-align: center" *ngIf="stopsSpinner">
                     <ion-spinner name="lines"></ion-spinner>
                 </div>

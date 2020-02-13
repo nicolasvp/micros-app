@@ -16,18 +16,13 @@ export class DatabaseService {
   FAVORITE_STOP_CODE: string = 'stop_code';
   FAVORITE_STOP_NAME: string = 'stop_name';
   STOPS_LIST: string = 'stops_list';
+  BIP_CARD: string = 'bip_card';
 
-  stops: Stop [] = [
-    {'stop_code': 'PI115','stop_name': 'PI115 - Parada 4 / (M) San Alberto Hurtado'},
-    {'stop_code': 'PA187','stop_name': 'PA187 - Parada 1 / (M) República'},
-    {'stop_code': 'PI423','stop_name': 'PI423 - Parada 1 / Vicente Reyes - Pajaritos'}
-  ];
+  stops: Stop [] = [];
 
-  MAX_STOPS_LIST_LENGTH = 3;
+  MAX_STOPS_LIST_LENGTH = 15;
 
-  constructor(private storage: Storage, private stopsService: StopsService) {
-    this.setStopToList();
-  }
+  constructor(private storage: Storage, private stopsService: StopsService) {}
 
   setFavoriteStopCode(code: string) {
     this.storage.set(this.FAVORITE_STOP_CODE, code);
@@ -35,6 +30,10 @@ export class DatabaseService {
 
   setFavoriteStopName(name: string) {
     this.storage.set(this.FAVORITE_STOP_NAME, name);
+  }
+
+  setBipCard(bipNumber: number) {
+    this.storage.set(this.BIP_CARD, bipNumber);
   }
 
   setStopToList() {
