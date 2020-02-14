@@ -22,7 +22,14 @@ export class DatabaseService {
 
   MAX_STOPS_LIST_LENGTH = 15;
 
-  constructor(private storage: Storage, private stopsService: StopsService) {}
+  constructor(private storage: Storage, private stopsService: StopsService) {
+    this.loadStopsInMemory();
+  }
+
+  // Carga los paraderos al inicio para dejarlos en memoria(variable stops)
+  async loadStopsInMemory() {
+    this.stops = await this.getValueFromDB(this.STOPS_LIST);
+  }
 
   setFavoriteStopCode(code: string) {
     this.storage.set(this.FAVORITE_STOP_CODE, code);
