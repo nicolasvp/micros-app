@@ -35,11 +35,17 @@ export class StartPage implements OnInit {
 
   ngOnInit() {}
 
+  // Al entrar a la vista carga la información de las proximas micros que llegarán y de la tarjeta bip
   ionViewWillEnter() {
     this.getStopInfo();
     this.getBipInfo();
   }
 
+  /**
+   * Vacía la lista de las proximas micros que vendrán
+   * Vacía la información de la bip
+   * Borra los mensajes de error y muestra los spinners
+   */
   ionViewDidLeave() {
     this.nextArrivals = [];
     this.bipInfo = null;
@@ -66,6 +72,7 @@ export class StartPage implements OnInit {
     }
   }
 
+  // Obtiene la informacion de la tarjeta bip desde la base de datos para despues mostrarla en la vista
   async getBipInfo() {
     const bipLastUpdate = await this.databaseService.getValueFromDB('bip_last_update');
     if (bipLastUpdate === null) {
@@ -89,6 +96,14 @@ export class StartPage implements OnInit {
     }
   }
 
+  /**
+   * Evento para refrescar la vista cuando se desliza hacia abajo, el cual realiza las siguientes acciones:
+   * Quita todos los mensajes de error y spinners
+   * Actualiza la información del paradero para mostrar los nuevos tiempos de las micros que llegarán
+   * Actualiza la información de la tarjeta bip
+   * Actualiza(obtiene) el nombre personalizado del paradero
+   * @param event
+   */
   doRefresh(event) {
     this.displayErrors('stop', '', false, true);
     this.displayErrors('bip', '', false, true);
@@ -100,8 +115,11 @@ export class StartPage implements OnInit {
     this.getInfoFromDB('stop_code');
     this.getInfoFromDB('stop_name');
   }
-
-  // Obtiene el paradero favorito guardado
+ 
+  /**
+   * Obtiene el paradero favorito guardado
+   * @param key: string, nombre de la llave del json con el cual se guardó la información en la base de datos
+   */
   async getInfoFromDB(key: string) {
     return await this.databaseService.getValueFromDB(key);
   }
@@ -144,11 +162,8 @@ export class StartPage implements OnInit {
     });
   }
 
-  setFavoriteStopNameOnDB(name: string) {
-    this.databaseService.setFavoriteStopName(name);
-  }
-
-  async addBipCard(name: string) {
+  // Agrega una nueva tarjeta bip através de un alert que contiene un input para ingresar el numero de esta
+  async addBipCard() {
     const bipAlert = await this.alertController.create({
       header: 'Número de tarjeta',
       inputs: [
@@ -165,6 +180,11 @@ export class StartPage implements OnInit {
           text: 'Aceptar',
           role: 'accept',
           handler: async (data) => {
+            /**
+             * Quita los espacios en blanco de los costados y valida que sea un numero el ingresado
+             * Luego remueve los errores y spinner desplegados(si es que los hay)
+             * Obtiene la información de la tarjeta bip ingresada para mostrarla en la vista
+             */
             if (data.cardNumber.trim() !== '' && !isNaN(data.cardNumber.trim())) {
               await this.setBipCardOnDB(data.cardNumber.trim());
               this.displayErrors('bip', '', false, true);
@@ -188,12 +208,28 @@ export class StartPage implements OnInit {
     });
   }
 
+  /**
+   * Guarda en la base de datos el numero de la tarjeta bip
+   * @param bipNumber: number, numero de la tarjeta bip que está impreso en el plastico
+   */
   setBipCardOnDB(bipNumber: number) {
     this.databaseService.setBipCard(bipNumber);
   }
 
+  /**
+   * Guarda en la base de datos la fecha de la ultima actualización en que se consultó el saldo de la tarjeta bip
+   * @param lastUpdate: string, fecha de la ultima actualización del saldo de la tarjeta bip
+   */
   setBipLastUpdateOnDB(lastUpdate: string) {
     this.databaseService.setBipLastUpdate(lastUpdate);
+  }
+
+  /**
+   * Guarda en la base de datos el nombre personalizado ingresado para el paradero elegido como favorito
+   * @param name: string, nombre personalizado del paradero favorito
+   */
+  setFavoriteStopNameOnDB(name: string) {
+    this.databaseService.setFavoriteStopName(name);
   }
 
   // Despliega los errores y spinners
@@ -201,8 +237,8 @@ export class StartPage implements OnInit {
    * 
    * @param type: string, tipo de error que se mostrará: bip o stop
    * @param message: string, mensaje que se mostrará en el error
-   * @param present: boolean, booleano que permite mostrar o no el error
-   * @param spinner: boolean, booleano que permite mostrar o no el spinner
+   * @param present: boolean, permite mostrar o no el error, true = mostrar, false = esconder
+   * @param spinner: boolean, permite mostrar o no el spinner, true = mostrar, false = esconder
    */
   displayErrors(type: string, message: string, present: boolean, spinner: boolean) {
     if (type === 'bip') {
@@ -216,11 +252,12 @@ export class StartPage implements OnInit {
     }
   }
 
+  // Obtiene la fecha actual y le da el formato dd/mm/yyyy
   getCurrentDate() {
     const today = new Date();
     const dd = String(today.getDate()).padStart(2, '0');
     const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     const yyyy = today.getFullYear();
-    return mm + '/' + dd + '/' + yyyy;
+    return dd + '/' + mm + '/' + yyyy;
   }
 }
