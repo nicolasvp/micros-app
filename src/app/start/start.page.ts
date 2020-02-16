@@ -67,6 +67,10 @@ export class StartPage implements OnInit {
   }
 
   async getBipInfo() {
+    const bipLastUpdate = await this.databaseService.getValueFromDB('bip_last_update');
+    if (bipLastUpdate === null) {
+      this.setBipLastUpdateOnDB(this.getCurrentDate());
+    }
     const bipNumber = await this.databaseService.getValueFromDB('bip_card');
     if (bipNumber !== null) {
       this.bipService.getBipInfo(bipNumber).subscribe(
@@ -188,7 +192,18 @@ export class StartPage implements OnInit {
     this.databaseService.setBipCard(bipNumber);
   }
 
+  setBipLastUpdateOnDB(lastUpdate: string) {
+    this.databaseService.setBipLastUpdate(lastUpdate);
+  }
+
   // Despliega los errores y spinners
+  /**
+   * 
+   * @param type: string, tipo de error que se mostrará: bip o stop
+   * @param message: string, mensaje que se mostrará en el error
+   * @param present: boolean, booleano que permite mostrar o no el error
+   * @param spinner: boolean, booleano que permite mostrar o no el spinner
+   */
   displayErrors(type: string, message: string, present: boolean, spinner: boolean) {
     if (type === 'bip') {
       this.bipErrorPresent = present;
@@ -199,5 +214,13 @@ export class StartPage implements OnInit {
       this.stopErrorMessage = message;
       this.stopSpinner = spinner;
     }
+  }
+
+  getCurrentDate() {
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    const yyyy = today.getFullYear();
+    return mm + '/' + dd + '/' + yyyy;
   }
 }

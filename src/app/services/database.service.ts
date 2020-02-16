@@ -17,9 +17,9 @@ export class DatabaseService {
   FAVORITE_STOP_NAME: string = 'stop_name';
   STOPS_LIST: string = 'stops_list';
   BIP_CARD: string = 'bip_card';
+  BIP_LAST_UPDATE = 'bip_last_update';
 
   stops: Stop [] = [];
-
   MAX_STOPS_LIST_LENGTH = 15;
 
   constructor(private storage: Storage, private stopsService: StopsService) {
@@ -28,7 +28,10 @@ export class DatabaseService {
 
   // Carga los paraderos al inicio para dejarlos en memoria(variable stops)
   async loadStopsInMemory() {
-    this.stops = await this.getValueFromDB(this.STOPS_LIST);
+    const storedStops = await this.getValueFromDB(this.STOPS_LIST);
+    if (storedStops !== null) {
+      this.stops = storedStops;
+    }
   }
 
   setFavoriteStopCode(code: string) {
@@ -45,6 +48,10 @@ export class DatabaseService {
 
   setStopToList() {
     this.storage.set(this.STOPS_LIST, this.stops);
+  }
+
+  setBipLastUpdate(lastUpdate: string) {
+    this.storage.set(this.BIP_LAST_UPDATE, lastUpdate);
   }
 
   // Obtiene el valor de la base de datos segun la key
@@ -111,9 +118,10 @@ export class DatabaseService {
   }
 
   checkMaxLengthStopList() {
-    const stopsLength = this.stops.length;
-    if (stopsLength >= this.MAX_STOPS_LIST_LENGTH) {
-      this.stops.splice(0, 1);
+    if (this.stops !== null) {
+      if (this.stops.length >= this.MAX_STOPS_LIST_LENGTH) {
+        this.stops.splice(0, 1);
+      }
     }
   }
 }

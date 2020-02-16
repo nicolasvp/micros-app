@@ -26,39 +26,48 @@ export class StopsPage {
               private popoverController: PopoverController) {
               }
 
+  // Al entrar en la vista de paraderos obtiene los paraderos buscados recientemente.
   ionViewWillEnter() {
     this.getRecentStops();
   }
 
+  // Cuando se sale de la vista se fuerza a cerrar el fab group(boton '+')
   ionViewDidLeave() {
-    // Cierra el fab group cuando sale de la pagina
     this.fabGroup.close();
   }
 
+  // Obtiene desde la base de datos los paraderos guardados
   async getRecentStops() {
     this.stops = await this.databaseService.getValueFromDB('stops_list');
   }
 
-  // Agrega el paradero como favorito, seteando el stop_code y removiendo el stop_name
+  /**
+   * Agrega el paradero como favorito, guardando en la base de datos el stop_code y removiendo el stop_name
+   * Luego cierra el popover
+   * @param stopCode: string, codigo del paradero Ej: PI587
+   */
   addStopAsFavorite(stopCode: string) {
     this.databaseService.setFavoriteStopCode(stopCode);
     this.databaseService.removeValueFromDB('stop_name');
     this.dismissPopOver();
   }
 
-  // Despliega una ventana(popover) con opciones para el paradero
+  /**
+   * Despliega una ventana(popover) con opciones para el paradero
+   * @param stopCode: string, codigo del paradero Ej: PI587
+   */
   async stopOptions(stopCode: any) {
     const stopOptions = await this.popoverController.create({
       component: StopsPopOverComponent,
       event: stopCode,
       translucent: true,
-      componentProps: {stopCode: stopCode, stopFunctions: this}
+      componentProps: {stopCode, stopFunctions: this}
     });
 
     return await stopOptions.present();
   }
 
-  // Despliega ventana(alert) para ingresar un nuevo paradero
+  // Despliega ventana(alert) con un input para ingresar un nuevo paradero
   async addNewStop() {
     const stopAlert = await this.alertController.create({
       header: 'Ingrese código',
@@ -89,7 +98,7 @@ export class StopsPage {
       ]
     });
 
-    // Setea el maximo largo del input
+    // Setea el maximo largo del input para restringir el maximo
     await stopAlert.present()
     .then(data => {
       document.getElementById('stopCode').setAttribute('maxlength', '7');
@@ -102,12 +111,15 @@ export class StopsPage {
       const role = data.role;
 
       if (role === 'accept' && this.stopCode !== '') {
-        this.getStopInfo(this.stopCode);
+        this.getStopInfoAndAddToDB(this.stopCode);
       }
     });
   }
 
-  // Despliega ventana(alert) para eliminar un paradero
+  /**
+   * Despliega ventana(alert) para eliminar un paradero, realiza una confirmacion
+   * @param stopCode: string, codigo del paradero Ej: PI587
+   */
   async deleteStop(stopCode: string) {
     const stopAlert = await this.alertController.create({
       header: 'Eliminar paradero',
@@ -135,14 +147,11 @@ export class StopsPage {
     await stopAlert.present();
   }
 
-  // Obtiene la información del paradero
-  getStopInfo(stopCode: string) {
-    if (!this.checkStopInList(stopCode)) {
-      this.stopInfoCall(stopCode);
-    }
-  }
-
-  // Válida si el paradero ya está en la lista, si lo está no hace nada
+  /**
+   * Evita la duplicidad de los paraderos
+   * Válida si el paradero ya está en la lista, si lo está no hace nada
+   * @param stopCode: string, codigo del paradero Ej: PI587
+   */
   checkStopInList(stopCode: string): boolean {
     let isPresent = false;
     if (this.stops !== null) {
@@ -155,28 +164,35 @@ export class StopsPage {
     return isPresent;
   }
 
-  // Realiza la llamada al servicio de Stops para obtener los paraderos
-  stopInfoCall(stopCode: string) {
-    this.stopsSpinner = true;
-    this.stopsService.getStopInfo(stopCode.toUpperCase()).subscribe(
-      async response => {
-        await this.databaseService.addStopWithObject(response);
-        this.getRecentStops();
-        this.stopsSpinner = false;
-        this.errorPresent = false;
-        this.errorMessage = null;
-      },
-      error => {
-        console.log(error);
-        if (error.status === 404) {
-          this.errorMessage = `Paradero ${stopCode} no encontrado.`;
-        } else {
-          this.errorMessage = 'Error al cargar información, inténtelo nuevamente.';
+  /**
+   * Obtiene la información del paradero mediante el codigo del paradero.0
+   * Luego lo agrega a la base de datos
+   * Finalmente quita el spinner y mensajes de errores presentes si es que no surge una excepcion
+   * @param stopCode: string, codigo del paradero Ej: PI587
+   */
+  getStopInfoAndAddToDB(stopCode: string) {
+    if (!this.checkStopInList(stopCode)) {
+      this.stopsSpinner = true;
+      this.stopsService.getStopInfo(stopCode.toUpperCase()).subscribe(
+        async response => {
+          await this.databaseService.addStopWithObject(response);
+          this.getRecentStops();
+          this.stopsSpinner = false;
+          this.errorPresent = false;
+          this.errorMessage = null;
+        },
+        error => {
+          console.log(error);
+          if (error.status === 404) {
+            this.errorMessage = `Paradero ${stopCode} no encontrado.`;
+          } else {
+            this.errorMessage = 'Error al cargar información, inténtelo nuevamente.';
+          }
+          this.errorPresent = true;
+          this.stopsSpinner = false;
         }
-        this.errorPresent = true;
-        this.stopsSpinner = false;
-      }
-    );
+      );
+    }
   }
 
   // Cierra ventana(popover) con las opciones del paradero
