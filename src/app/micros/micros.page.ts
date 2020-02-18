@@ -41,6 +41,11 @@ export class MicrosPage implements OnInit {
     this.addStopToDB();
   }
 
+  /**
+   * Cuando se cambia de vista se cancelan todas las llamadas a la API
+   * Se quita el spinner de micros
+   * Se vacia la lista de micros
+   */
   ionViewDidLeave() {
     if (this.subcriber !== null) {
       this.subcriber.unsubscribe();
@@ -49,6 +54,7 @@ export class MicrosPage implements OnInit {
     this.micros = [];
   }
 
+  // Agrega 
   async addStopToDB() {
     if (this.stopCode !== null) {
       const stopsList = await this.getInfoFromDB('stops_list');
@@ -58,7 +64,12 @@ export class MicrosPage implements OnInit {
     }
   }
 
-  // Válida si el paradero ya está en la lista, si lo está no hace nada
+  /**
+   * Válida si el paradero que se guarda en la variable de clase stopCode ya está en la lista de paradero, si lo está no hace nada
+   * devolviendo true si está o false si no está
+   * @param stops: arreglo de Stop que se recorrerá para determinar si está o no el paradero
+   * @return boolean: true o false
+   */
   checkStopInList(stops: Stop[]): boolean {
     let isPresent = false;
     if (stops !== null) {
@@ -71,10 +82,15 @@ export class MicrosPage implements OnInit {
     return isPresent;
   }
 
+  /**
+   * Obtiene la informacion de la base de datos segun la llave que se le pase
+   * @param key: string, llave del json para buscar en la base de datos
+   */
   async getInfoFromDB(key: string) {
     return await this.databaseService.getValueFromDB(key);
   }
 
+  // Obtiene las micros si es que existe un paradero seleccionado
   getMicros() {
     if (this.stopCode !== null) {
       this.getMicrosInfo();
@@ -83,6 +99,10 @@ export class MicrosPage implements OnInit {
     }
   }
 
+  /**
+   * Refresca la pagina cargando nuevamente la informacion de las micros
+   * @param event
+   */
   doRefresh(event) {
     this.errorPresent = false;
     if (this.stopCode !== '') {
@@ -110,6 +130,11 @@ export class MicrosPage implements OnInit {
     );
   }
 
+  /**
+   * Despliega un popOver con las direcciones a las cuales puede ir la micro seleccionada
+   * @param microCode: any, codigo de la micro Ej: PI587
+   * @param direction: string, direccion a la que se dirige la micro, puede ser 0 o 1
+   */
   async microOptions(microCode: any, direction: string) {
     const microOptions = await this.popoverController.create({
       component: MicrosPopOverComponent,
@@ -121,6 +146,11 @@ export class MicrosPage implements OnInit {
     await microOptions.present();
   }
 
+  /**
+   * Obtiene las direcciones hacia las cuales se puede dirigir una micro, siempre son 2(ida y vuelta)
+   * @param microCode: string, codigo de la micro Ej: PI587
+   * @param direction: string, direccion a la que se dirige la micro, puede ser 0 o 1
+   */
   getMicrosDirections(microCode: string, direction: string) {
     console.log('cargando...')
     this.microsService.getMicroRouteByDirection(microCode, direction).subscribe(

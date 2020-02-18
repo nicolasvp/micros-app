@@ -176,8 +176,13 @@ export class MapPage implements OnInit, AfterViewInit {
     this.infoWindow.setContent('<ion-spinner name="lines"></ion-spinner>');
   }
 
-  // Crea el contenido del windowInfo con el evento de click y toda la informacion
-  setInfoWindowContent(micros, currentStop, stop) {
+  /**
+   * Crea el contenido del windowInfo con el evento de click y toda la informacion
+   * @param micros: array, arreglo con todas las micros que se dirigen al paradero
+   * @param currentStop: objeto stop, paradero actual
+   * @param stop: any, objeto de paradero de la api de google
+   */
+  setInfoWindowContent(micros: any[], currentStop: Stop, stop: any) {
     this.infoWindow.setContent(this.setContentMarker(micros, currentStop));
     this.infoWindow.open(this.map, stop);
     this.infoWindow.addListener('domready', () => {
@@ -194,7 +199,12 @@ export class MapPage implements OnInit, AfterViewInit {
     });
   }
 
-  // Retorna el HTML en un string con la información que se muestra en el marker
+
+  /**
+   * Retorna el HTML en un string con la información que se muestra en el marker
+   * @param micros: array, arreglo con todas las micros que se dirigen al paradero
+   * @param currentStop: objeto stop, paradero actual
+   */
   setContentMarker(micros: any[], currentStop: Stop) {
     let microsBadges: string = '';
 
@@ -212,15 +222,18 @@ export class MapPage implements OnInit, AfterViewInit {
             '</div>';
   }
 
-  // Formatea el nombre del paradero para dejarlo sin el codigo al inicio
-  // Ej: PI1-Las Torres / Simon Bolivar => Las Torres / Simon Bolivar
-  formatStopName(value: string) {
-    const splits = value.split('-');
+  /**
+   * Formatea el nombre del paradero para dejarlo sin el codigo al inicio
+   * Ej: PI1-Las Torres / Simon Bolivar => Las Torres / Simon Bolivar
+   * @param stopName: string, nombre del paradero
+   */
+  formatStopName(stopName: string) {
+    const splits = stopName.split('-');
     if (splits.length > 1) {
       length = splits[0].length;
-      return value.substr(length + 1, value.length);
+      return stopName.substr(length + 1, stopName.length);
     } else {
-      return value;
+      return stopName;
     }
   }
 

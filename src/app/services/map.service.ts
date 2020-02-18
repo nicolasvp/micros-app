@@ -8,11 +8,16 @@ import { throwError } from 'rxjs';
 })
 export class MapService {
 
+  // Radio alrededor del punto de ubicacion del cliente en el que se buscarán paraderos
   RADIUS = 1000;
 
   constructor(private http: HttpClient) { }
 
-  // Obtiene las paradas alrededor de una locatidad(latitud y longitud)
+  /**
+   * Obtiene los paraderos alrededor de una localidad(latitud y longitud)
+   * @param latitude: number, latitud en numero decimal
+   * @param longitude: number, longitud en numero decimal
+   */
   getStopsAround(latitude: number, longitude: number) {
     return this.http.get<any>(`https://api.scltrans.it/v2/map?radius=${this.RADIUS}&center_lat=${latitude}&center_lon=${longitude}`)
     .pipe(

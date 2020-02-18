@@ -12,8 +12,11 @@ export class BipService {
 
   constructor(private http: HttpClient, private databaseService: DatabaseService) { }
 
-  // Obtiene la informacion de la tarjeta bip
-  // El saldo se actualiza durante la noche por lo que presenta un desfase durante el día
+  /**
+   * Obtiene la informacion de la tarjeta bip
+   * El saldo se actualiza durante la noche por lo que presenta un desfase durante el día
+   * @param bipNumber: string, numero de la tarjeta bip Ej: 12345678
+   */
   getBipInfo(bipNumber: string) {
     return this.http.get<Bip>(`http://bip-servicio.herokuapp.com/api/v1/solicitudes.json?bip=${bipNumber}`)
     .pipe(

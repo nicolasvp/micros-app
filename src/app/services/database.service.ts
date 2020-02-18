@@ -54,7 +54,10 @@ export class DatabaseService {
     this.storage.set(this.BIP_LAST_UPDATE, lastUpdate);
   }
 
-  // Obtiene el valor de la base de datos segun la key
+  /**
+   * Obtiene el valor de la base de datos segun la key
+   * @param key: string, llave del valor almacenado en la base de datos que se desea obtener
+   */
   getValueFromDB(key: string) {
     return this.storage.get(key).then(
       (value) => {
@@ -65,7 +68,7 @@ export class DatabaseService {
 
   /**
    * Elimina un valor de la base de datos segun la key
-   * @param key
+   * @param key: string, llave del valor almacenado en la base de datos
    */
   removeValueFromDB(key: string) {
     this.storage.remove(key);
@@ -73,7 +76,7 @@ export class DatabaseService {
 
   /**
    * Elimina de la lista(array stops) y luego actualiza el valor del stops en la base de datos
-   * @param code
+   * @param code: string, codigo del paradero Ej: PI587
    */
   removeStopFromList(code: string) {
     const index = this.stops.findIndex(x => x.stop_code === code);
@@ -85,7 +88,7 @@ export class DatabaseService {
 
   /**
    * Agrega un paradero buscando primero la información en la API segun el stopCode
-   * @param stop
+   * @param stop: string, codigo del paradero Ej: PI587
    */
   addStopWithStopCode(stop: string) {
     this.stopsService.getStopInfo(stop).subscribe(
@@ -106,7 +109,7 @@ export class DatabaseService {
   /**
    * Agrega un paradero con toda la información necesaria,
    * no necesita ir a buscar la info a la API
-   * @param stop
+   * @param stop: Stop, objeto de paradero con todos sus atributos(name, code, etc)
    */
   addStopWithObject(stop: Stop) {
     this.checkMaxLengthStopList();
@@ -117,6 +120,10 @@ export class DatabaseService {
     this.setStopToList();
   }
 
+  /**
+   * Revisa si se alcanzó el limite maximo de la lista de paraderos, si lo alcanzó entonces elimina el primero de la lista
+   * Orden FIFO
+   */
   checkMaxLengthStopList() {
     if (this.stops !== null) {
       if (this.stops.length >= this.MAX_STOPS_LIST_LENGTH) {
