@@ -20,15 +20,16 @@ export class MicrosService {
     return this.http.get(`https://api.scltrans.it/v2/routes/${microCode}/directions/${directionId}`)
     .pipe(
       map((response: any) => {
-        return response.results.stop_times;
+        return response.results.shape;
       }),
       catchError(e => throwError(e))
     );
   }
 
   /**
-   * Obtiene la ruta de una micro de ida y de vuelta segun el "numero" de la micro
-   * Ej: I03, este endpoint se demora más de los normal, 1 a 6 segundos
+   * Obtiene las direcciones de una micro de ida y de vuelta segun el codigo de la micro
+   * Siempre devolverá 2 direcciones (0 y 1)
+   * Ej: I03 => devuelve "Villa Portales" y "Villa los Heroes"
    * @param microCode: string, code la micro Ej: I03
    */
   getAllMicroRoutes(microCode: string) {

@@ -8,6 +8,8 @@ import { MicrosPopOverComponent } from '../component/micros-pop-over/micros-pop-
 import { Subscription } from 'rxjs';
 import { DatabaseService } from '../services/database.service';
 import { Stop } from '../interfaces/stop';
+import { NavController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-micros',
@@ -27,7 +29,8 @@ export class MicrosPage implements OnInit {
               private stopService: StopsService,
               private microsService: MicrosService,
               public popoverController: PopoverController,
-              private databaseService: DatabaseService) {}
+              private databaseService: DatabaseService,
+              public navCtrl: NavController) {}
 
   // Se mantiene el ultimo paradero cargado para que no se pierda la ultima información
   ngOnInit() {
@@ -147,17 +150,13 @@ export class MicrosPage implements OnInit {
   }
 
   /**
-   * Obtiene las direcciones hacia las cuales se puede dirigir una micro, siempre son 2(ida y vuelta)
+   * Redirige hacia la vista map
    * @param microCode: string, codigo de la micro Ej: PI587
    * @param direction: string, direccion a la que se dirige la micro, puede ser 0 o 1
    */
   getMicrosDirections(microCode: string, direction: string) {
-    console.log('cargando...')
-    this.microsService.getMicroRouteByDirection(microCode, direction).subscribe(
-      response => {
-      console.log(response);
-    });
     this.dismissPopOver();
+    this.navCtrl.navigateForward(`/tabs/map/${microCode}/${direction}`);
   }
 
   // Cierra ventana(popover) con las opciones del paradero

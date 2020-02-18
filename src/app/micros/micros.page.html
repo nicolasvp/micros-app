@@ -30,7 +30,7 @@
                         <h2>{{ errorMessage }}</h2>
                     </ion-label>
                 </div>
-                <ion-item *ngFor="let micro of micros" class="animated fadeIn fast" (press)="microOptions(micro.route_id)">
+                <ion-item *ngFor="let micro of micros" class="animated fadeIn fast" (click)="microOptions(micro.route_id)">
                     <ion-thumbnail slot="start" class="thumbnail-text">
                         <img src="../../assets/img/background-1.jpg">
                         <div class="centered">

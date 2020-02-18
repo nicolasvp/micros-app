@@ -44,11 +44,11 @@ export class StopsService {
   }
 
   /**
-   * Reajusta la distancia que muestra la API, le disminuye 500 metros y le agrega un ' m.' Ej: 1200 m.
+   * Reajusta la distancia que muestra la API, le disminuye 400 metros y le agrega un ' m.' Ej: 1200 m.
    * @param busDistance: number, distancia en metros a la que viene la micro del paradero
    */
   reCalculateDistance(busDistance: number) {
-    const tempDistance = busDistance - 500;
+    const tempDistance = busDistance - 400;
     return tempDistance > 0 ? tempDistance + ' m.' : null;
   }
 

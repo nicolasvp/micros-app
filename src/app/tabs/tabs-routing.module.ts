@@ -49,6 +49,11 @@ const routes: Routes = [
             path: '',
             loadChildren: () =>
               import('../map/map.module').then(m => m.MapPageModule)
+          },
+          {
+            path: ':microCode/:direction',
+            loadChildren: () =>
+              import('../map/map.module').then(m => m.MapPageModule)
           }
         ]
       },

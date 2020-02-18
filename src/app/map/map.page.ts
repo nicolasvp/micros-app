@@ -6,6 +6,8 @@ import { StopsService } from '../services/stops.service';
 import { NgZone } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { MicrosService } from '../services/micros.service';
 
 declare var google;
 
@@ -30,6 +32,7 @@ export class MapPage implements OnInit, AfterViewInit {
   };
   showSpinner: boolean = true;
   subcriber: Subscription;
+  shapesDirections: any[] = [];
 
   @ViewChild('mapElement', {static: false}) mapElement: ElementRef;
 
@@ -37,22 +40,61 @@ export class MapPage implements OnInit, AfterViewInit {
     private mapService: MapService,
     private stopsService: StopsService,
     public ngZone: NgZone,
-    public navCtrl: NavController) { }
+    public navCtrl: NavController,
+    private activatedRoute: ActivatedRoute,
+    private microsService: MicrosService) { }
 
   ngOnInit(): void {}
 
   // Carga los paraderos segun la posición al inicio cuando se va a entrar a la vista
   ionViewWillEnter() {
-    this.geolocation.getCurrentPosition().then((geoposition: Geoposition) => {
-      this.getLatAndLog(geoposition);
-      this.setDefaultMap();
-      this.setCurrentPositionOnMap();
-      this.getStopsAround();
-      this.showSpinner = false;
-      document.getElementById('map').style.display = 'block';
-    })
-    .catch((error) => {
-      console.log('Error getting location', error);
+    const microCode = this.activatedRoute.snapshot.paramMap.get('microCode');
+    const direction = this.activatedRoute.snapshot.paramMap.get('direction');
+
+    if (direction !== null && microCode !== null) {
+      this.microsService.getMicroRouteByDirection(microCode, direction).subscribe(
+        response => {
+          this.setDefaultMap();
+          const shapesAsPositions = this.setShapesAsPositions(response);
+          this.setShapeMarkers(shapesAsPositions);
+          this.showSpinner = false;
+          document.getElementById('map').style.display = 'block';
+      });
+    } else {
+      this.geolocation.getCurrentPosition().then((geoposition: Geoposition) => {
+        this.getLatAndLog(geoposition);
+        this.setDefaultMap();
+        this.setCurrentPositionOnMap();
+        this.getStopsAround();
+        this.showSpinner = false;
+        document.getElementById('map').style.display = 'block';
+      })
+      .catch((error) => {
+        console.log('Error getting location', error);
+      });
+    }    
+  }
+
+  // Crea un arreglo con las posiciones de las direcciones
+  setShapesAsPositions(shapes: any[]) {
+    const shapesPositions = [];
+    shapes.forEach( shape => {
+      shapesPositions.push({
+        position: new google.maps.LatLng(shape.shape_pt_lat, shape.shape_pt_lon)
+      });
+    });
+    return shapesPositions;
+  }
+
+  // Crea un arreglo de markers segun los shapes de la micro
+  setShapeMarkers(shapesAsPositions: any[]) {
+    const shapesMarkers = [];
+    shapesAsPositions.forEach( shape => {
+      shapesMarkers.push(new google.maps.Marker({
+        position: shape.position,
+        //icon: this.customIcon,
+        map: this.map
+      }));
     });
   }
 
