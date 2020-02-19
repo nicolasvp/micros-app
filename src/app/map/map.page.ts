@@ -46,31 +46,68 @@ export class MapPage implements OnInit, AfterViewInit {
 
   ngOnInit(): void {}
 
-  // Carga los paraderos segun la posición al inicio cuando se va a entrar a la vista
+  ngAfterViewInit(): void {}
+
+  /**
+   * Carga los paraderos segun la posición al inicio cuando se va a entrar a la vista
+   * Adicionalmente si se pasan los parametros microCode y direction entonces se dibujará el recorrido de la micro
+   */
   ionViewWillEnter() {
     const microCode = this.activatedRoute.snapshot.paramMap.get('microCode');
     const direction = this.activatedRoute.snapshot.paramMap.get('direction');
 
-    if (direction !== null && microCode !== null) {
-      this.getRouteAndDraw(microCode, parseInt(direction));
-    } else {
-      this.geolocation.getCurrentPosition().then((geoposition: Geoposition) => {
-        this.getLatAndLog(geoposition);
-        this.setDefaultMap();
-        this.setCurrentPositionOnMap();
-        this.getStopsAround();
-        this.showSpinner = false;
-        document.getElementById('map').style.display = 'block';
-      })
-      .catch((error) => {
-        console.log('Error getting location', error);
-      });
-    }
+    this.geolocation.getCurrentPosition().then((geoposition: Geoposition) => {
+      this.getLatAndLog(geoposition);
+      this.setDefaultMap();
+      this.setCurrentPositionOnMap();
+      this.getStopsAround();
+      if (direction !== null && microCode !== null) {
+        this.getRouteAndDraw(microCode, parseInt(direction));
+      }
+    })
+    .catch((error) => {
+      console.log('Error getting location', error);
+    });
   }
 
-  // Inicializa el mapa con los paraderos alrededor
-  initMapWithStopsAround() {
+  // Setea los arrays como empty para que no se acumulen cuando se vuelvan a cargar al momento de volver a la pagina
+  ionViewDidLeave() {
+    this.stopsAround = [];
+    this.stopsAroundPositions = [];
+    this.stopMarkers = [];
+    this.showSpinner = true;
+    document.getElementById('map').style.display = 'none';
+  }
 
+  getLatAndLog(geoposition: Geoposition) {
+    this.latitude = geoposition.coords.latitude;
+    this.longitude = geoposition.coords.longitude;
+  }
+
+  // Setea una posición inicial en el mapa
+  setDefaultMap() {
+    this.map = new google.maps.Map(this.mapElement.nativeElement, {
+      center: {lat: -33.41271959, lng: -70.6061205}, // parque titanium, las condes
+      zoom: 16,
+      clickableIcons: false
+    });
+    this.map.addListener('click', () => {
+      this.closeWindowInfo();
+    });
+  }
+
+  // Setea la posición actual en el mapa
+  setCurrentPositionOnMap() {
+    this.currentPosition = {
+      lat: this.latitude,
+      lng: this.longitude
+    };
+    this.map.setCenter(this.currentPosition);
+    const myPositionMarker = new google.maps.Marker({
+      position: new google.maps.LatLng(this.latitude, this.longitude),
+      map: this.map,
+      title: 'AQUI ESTOY!'
+    });
   }
 
   /**
@@ -82,12 +119,11 @@ export class MapPage implements OnInit, AfterViewInit {
   getRouteAndDraw(microCode: string, direction: number) {
     this.microsService.getMicroRouteByDirection(microCode, direction).subscribe(
       response => {
-        this.setDefaultMap();
         const points = response.map(shape => {
           return {
             lat: parseFloat(shape.shape_pt_lat),
             lng: parseFloat(shape.shape_pt_lon)
-          }
+          };
         });
         this.drawRoute(points);
         //const shapesAsPositions = this.setShapesAsPositions(response);
@@ -97,6 +133,24 @@ export class MapPage implements OnInit, AfterViewInit {
     });
   }
 
+  /**
+   * Dibuja con una linea roja la ruta de la micro
+   * Se basa en un array con los puntos(latitud, longitud) entregados por la API
+   * @param points: any, array con los puntos de la ruta
+   */
+  drawRoute(points: any[]) {
+    const microRoute = new google.maps.Polyline({
+      path: points,
+      geodesic: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 1.0,
+      strokeWeight: 2
+    });
+
+    microRoute.setMap(this.map);
+  }
+
+/*
   // Crea un arreglo con las posiciones de las direcciones
   setShapesAsPositions(shapes: any[]) {
     const shapesPositions = [];
@@ -120,65 +174,7 @@ export class MapPage implements OnInit, AfterViewInit {
       }));
     });
   }
-
-  // Setea los arrays como empty para que no se acumulen cuando se vuelvan a cargar al momento de volver a la pagina
-  ionViewDidLeave() {
-    this.stopsAround = [];
-    this.stopsAroundPositions = [];
-    this.stopMarkers = [];
-    this.showSpinner = true;
-    document.getElementById('map').style.display = 'none';
-  }
-
-  ngAfterViewInit(): void {}
-
-  getLatAndLog(geoposition: Geoposition) {
-    this.latitude = geoposition.coords.latitude;
-    this.longitude = geoposition.coords.longitude;
-  }
-
-  // Setea una posición inicial en el mapa
-  setDefaultMap() {
-    this.map = new google.maps.Map(this.mapElement.nativeElement, {
-      center: {lat: -33.41271959, lng: -70.6061205}, // parque titanium, las condes
-      zoom: 16,
-      clickableIcons: false
-    });
-    this.map.addListener('click', () => {
-      this.closeWindowInfo();
-    });
-  }
-
-  /**
-   * Dibuja con una linea roja la ruta de la micro
-   * Se basa en un array con los puntos(latitud, longitud) entregados por la API
-   * @param points: any, array con los puntos de la ruta
-   */
-  drawRoute(points: any[]) {
-    const microRoute = new google.maps.Polyline({
-      path: points,
-      geodesic: true,
-      strokeColor: '#FF0000',
-      strokeOpacity: 1.0,
-      strokeWeight: 2
-    });
-
-    microRoute.setMap(this.map);
-  }
-
-  // Setea la posición actual en el mapa
-  setCurrentPositionOnMap() {
-    this.currentPosition = {
-      lat: this.latitude,
-      lng: this.longitude
-    };
-    this.map.setCenter(this.currentPosition);
-    const myPositionMarker = new google.maps.Marker({
-      position: new google.maps.LatLng(this.latitude, this.longitude),
-      map: this.map,
-      title: 'AQUI ESTOY!'
-    });
-  }
+*/
 
   /* Obtiene todos los paraderos de alrededor segun lat y lon y los guarda en un arreglo
   * Guarda las posiciones de los paraderos en un arreglo
@@ -191,6 +187,8 @@ export class MapPage implements OnInit, AfterViewInit {
         this.setStopsAsPositions();
         this.setMarkers();
         this.buildInfoWindow();
+        this.showSpinner = false;
+        document.getElementById('map').style.display = 'block';
       },
       error => {
         console.log(error);

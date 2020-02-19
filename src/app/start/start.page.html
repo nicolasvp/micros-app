@@ -26,15 +26,16 @@
                     </h2>
                 </ion-label>
             </div>
-            <div style="text-align: center" *ngIf="bipInfo" class="animated fadeIn fast" (click)="addBipCard()">
+            <div style="text-align: center" class="animated fadeIn fast" (click)="addBipCard()">
                 <h1>
                     Saldo Bip
-                    <ion-icon name="create" style="font-size: 17px;"></ion-icon>
                 </h1>
-                <h1>{{ bipInfo.saldoTarjeta }}</h1>
-                <h3>Última actualización: {{ bipInfo.fechaSaldo }}</h3>
-                <h3>Número de tarjeta: {{ bipInfo.id }}</h3>
-                <h3>Estado de tarjeta: {{ bipInfo.estadoContrato }}</h3>
+                <div *ngIf="bipInfo">
+                    <h1>{{ bipInfo.saldoTarjeta }}</h1>
+                    <h3>Última actualización: {{ bipInfo.fechaSaldo }}</h3>
+                    <h3>Número de tarjeta: {{ bipInfo.id }}</h3>
+                    <h3>Estado de tarjeta: {{ bipInfo.estadoContrato }}</h3>
+                </div>
             </div>
         </ion-card-content>
     </ion-card>

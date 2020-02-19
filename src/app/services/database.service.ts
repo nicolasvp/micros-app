@@ -16,7 +16,8 @@ export class DatabaseService {
   FAVORITE_STOP_CODE: string = 'stop_code';
   FAVORITE_STOP_NAME: string = 'stop_name';
   STOPS_LIST: string = 'stops_list';
-  BIP_CARD: string = 'bip_card';
+  BIP_INFO: string = 'bip_info';
+  BIP_NUMBER: string = 'bip_number';
   BIP_LAST_UPDATE = 'bip_last_update';
 
   stops: Stop [] = [];
@@ -42,8 +43,12 @@ export class DatabaseService {
     this.storage.set(this.FAVORITE_STOP_NAME, name);
   }
 
-  setBipCard(bipNumber: number) {
-    this.storage.set(this.BIP_CARD, bipNumber);
+  setBipNumber(bipNumber: number) {
+    this.storage.set(this.BIP_NUMBER, bipNumber);
+  }
+
+  setBipInfo(bipInfo: any) {
+    this.storage.set(this.BIP_INFO, bipInfo);
   }
 
   setStopToList() {

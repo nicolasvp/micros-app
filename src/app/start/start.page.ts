@@ -72,28 +72,56 @@ export class StartPage implements OnInit {
     }
   }
 
-  // Obtiene la informacion de la tarjeta bip desde la base de datos para despues mostrarla en la vista
+  /**
+   * Obtiene la informacion de la tarjeta bip desde la base de datos para despues mostrarla en la vista
+   * Primero consulta si se hizo una actualizacion el día de hoy, para asi no tener que cargar los datos 
+   * a cada rato, ya que la informacion de la API de la bip se actualiza solo 1 vez al día(en la noche)
+   * los datos se mantienen iguales durante todo el día, de esta forma se mantienen guardados en la base de datos
+   * hasta que se actualicen nuevamente al consultar por la fecha de la ultima actualizacion(bip_last_update) que está guardada en la base de datos.
+   * 
+   * En el caso de que ya se halla hecho una actualizacion el día de hoy, solo se cargaran los datos de la tarjeta que están
+   * guardados en la base de datos
+   */
   async getBipInfo() {
-    const bipLastUpdate = await this.databaseService.getValueFromDB('bip_last_update');
-    if (bipLastUpdate === null) {
-      this.setBipLastUpdateOnDB(this.getCurrentDate());
-    }
-    const bipNumber = await this.databaseService.getValueFromDB('bip_card');
+    const bipNumber = await this.databaseService.getValueFromDB('bip_number');
     if (bipNumber !== null) {
-      this.bipService.getBipInfo(bipNumber).subscribe(
-        response => {
-          this.bipInfo = response;
-          this.displayErrors('bip', '', false, false);
-        },
-        error => {
-          console.log('Error al cargar saldo bip');
-          this.displayErrors('bip', 'Error al carga saldo bip', true, false);
-          this.bipInfo = null;
-        }
-      );
+      let bipInfoUpdated = await this.getBipLastUpdate();
+      if(bipInfoUpdated) {
+        this.bipService.getBipInfo(bipNumber).subscribe(
+          response => {
+            this.setBipInfoOnDB(response);
+            this.bipInfo = response;
+            this.displayErrors('bip', '', false, false);
+          },
+          error => {
+            console.log('Error al cargar saldo bip.', error);
+            this.displayErrors('bip', 'Error al carga saldo bip', true, false);
+            this.bipInfo = null;
+          }
+        );
+      } else {
+        this.displayErrors('bip', '', false, false);
+        this.bipInfo = await this.databaseService.getValueFromDB('bip_info');
+      }
     } else {
       this.displayErrors('bip', '¡Agregue el numero de su bip!', true, false);
     }
+  }
+
+  /**
+   * Verifica si la fecha de la ultima actualizacion de la informacion de la tarjeta bip es la de hoy
+   * Si la fecha no es igual o no está seteada(null) entonces guarda la fecha actual como la ultima
+   * @return boolean: Si retorna true es por que se actualizó la fecha, 
+   * si retorna false es por que no se actualizó es decir ya se hizo una actualizacion el día de hoy
+   */
+  async getBipLastUpdate() {
+    const bipLastUpdate = await this.databaseService.getValueFromDB('bip_last_update');
+    const currentDate = this.getCurrentDate();
+    if (bipLastUpdate === null || bipLastUpdate !== currentDate) {
+      this.setBipLastUpdateOnDB(currentDate);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -186,7 +214,7 @@ export class StartPage implements OnInit {
              * Obtiene la información de la tarjeta bip ingresada para mostrarla en la vista
              */
             if (data.cardNumber.trim() !== '' && !isNaN(data.cardNumber.trim())) {
-              await this.setBipCardOnDB(data.cardNumber.trim());
+              await this.setBipNumberOnDB(data.cardNumber.trim());
               this.displayErrors('bip', '', false, true);
               this.getBipInfo();
             }
@@ -212,8 +240,16 @@ export class StartPage implements OnInit {
    * Guarda en la base de datos el numero de la tarjeta bip
    * @param bipNumber: number, numero de la tarjeta bip que está impreso en el plastico
    */
-  setBipCardOnDB(bipNumber: number) {
-    this.databaseService.setBipCard(bipNumber);
+  setBipNumberOnDB(bipNumber: any) {
+    this.databaseService.setBipNumber(bipNumber);
+  }
+
+  /**
+   * Guarda en la base de datos la informacion de la tarjeta bip devuelta por la API
+   * @param bipInfo: any, json con informacion de la tarjeta bip
+   */
+  setBipInfoOnDB(bipInfo: any) {
+    this.databaseService.setBipInfo(bipInfo);
   }
 
   /**
