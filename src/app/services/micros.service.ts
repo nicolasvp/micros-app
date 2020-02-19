@@ -14,9 +14,9 @@ export class MicrosService {
    * Obtiene la ruta de una micro segun la direction(ida o vuelta) que se le pase (0 o 1)
    * microCode => "numero" de la micro Ej: I03
    * @param microCode: string, codigo de la micro Ej: I03
-   * @param directionId: string, direccion de la micro, puede ser 1 o 0
+   * @param directionId: number, direccion de la micro, puede ser 1 o 0
    */
-  getMicroRouteByDirection(microCode: string, directionId: string) {
+  getMicroRouteByDirection(microCode: string, directionId: number) {
     return this.http.get(`https://api.scltrans.it/v2/routes/${microCode}/directions/${directionId}`)
     .pipe(
       map((response: any) => {

@@ -52,14 +52,7 @@ export class MapPage implements OnInit, AfterViewInit {
     const direction = this.activatedRoute.snapshot.paramMap.get('direction');
 
     if (direction !== null && microCode !== null) {
-      this.microsService.getMicroRouteByDirection(microCode, direction).subscribe(
-        response => {
-          this.setDefaultMap();
-          const shapesAsPositions = this.setShapesAsPositions(response);
-          this.setShapeMarkers(shapesAsPositions);
-          this.showSpinner = false;
-          document.getElementById('map').style.display = 'block';
-      });
+      this.getRouteAndDraw(microCode, parseInt(direction));
     } else {
       this.geolocation.getCurrentPosition().then((geoposition: Geoposition) => {
         this.getLatAndLog(geoposition);
@@ -72,7 +65,36 @@ export class MapPage implements OnInit, AfterViewInit {
       .catch((error) => {
         console.log('Error getting location', error);
       });
-    }    
+    }
+  }
+
+  // Inicializa el mapa con los paraderos alrededor
+  initMapWithStopsAround() {
+
+  }
+
+  /**
+   * Obtiene los puntos(lat y lon) del recorrido de la micro
+   * Crea un array con los puntos y luego dibuja en el mapa una linea roja pasando por todos los puntos
+   * @param direction: number, direccion del recorrido de la micro, puede ser 0 o 1
+   * @param microCode: string, codigo de la micro Ej: I03
+   */
+  getRouteAndDraw(microCode: string, direction: number) {
+    this.microsService.getMicroRouteByDirection(microCode, direction).subscribe(
+      response => {
+        this.setDefaultMap();
+        const points = response.map(shape => {
+          return {
+            lat: parseFloat(shape.shape_pt_lat),
+            lng: parseFloat(shape.shape_pt_lon)
+          }
+        });
+        this.drawRoute(points);
+        //const shapesAsPositions = this.setShapesAsPositions(response);
+        //this.setShapeMarkers(shapesAsPositions);
+        this.showSpinner = false;
+        document.getElementById('map').style.display = 'block';
+    });
   }
 
   // Crea un arreglo con las posiciones de las direcciones
@@ -93,6 +115,7 @@ export class MapPage implements OnInit, AfterViewInit {
       shapesMarkers.push(new google.maps.Marker({
         position: shape.position,
         //icon: this.customIcon,
+        animation: 'DROP',
         map: this.map
       }));
     });
@@ -124,6 +147,23 @@ export class MapPage implements OnInit, AfterViewInit {
     this.map.addListener('click', () => {
       this.closeWindowInfo();
     });
+  }
+
+  /**
+   * Dibuja con una linea roja la ruta de la micro
+   * Se basa en un array con los puntos(latitud, longitud) entregados por la API
+   * @param points: any, array con los puntos de la ruta
+   */
+  drawRoute(points: any[]) {
+    const microRoute = new google.maps.Polyline({
+      path: points,
+      geodesic: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 1.0,
+      strokeWeight: 2
+    });
+
+    microRoute.setMap(this.map);
   }
 
   // Setea la posición actual en el mapa
