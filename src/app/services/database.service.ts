@@ -23,7 +23,11 @@ export class DatabaseService {
   stops: Stop [] = [];
   MAX_STOPS_LIST_LENGTH = 15;
 
-  constructor(private storage: Storage, private stopsService: StopsService) {
+  constructor(private storage: Storage, private stopsService: StopsService) {}
+
+  ngOnInit(): void {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
     this.loadStopsInMemory();
   }
 

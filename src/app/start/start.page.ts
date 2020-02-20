@@ -268,7 +268,6 @@ export class StartPage implements OnInit {
     this.databaseService.setFavoriteStopName(name);
   }
 
-
   /**
    * Despliega los errores y spinners
    * @param type: string, tipo de error que se mostrará: bip o stop
