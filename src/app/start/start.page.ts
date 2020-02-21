@@ -38,7 +38,9 @@ export class StartPage implements OnInit {
   // Al entrar a la vista carga la información de las proximas micros que llegarán y de la tarjeta bip
   ionViewWillEnter() {
     this.getStopInfo();
-    this.getBipInfo();
+    if(this.getBipLastUpdate()){
+      this.getBipInfo();
+    } 
   }
 
   /**
@@ -51,6 +53,26 @@ export class StartPage implements OnInit {
     this.bipInfo = null;
     this.displayErrors('bip', '', false, true);
     this.displayErrors('stop', '', false, true);
+  }
+
+  /**
+   * Evento para refrescar la vista cuando se desliza hacia abajo, el cual realiza las siguientes acciones:
+   * Quita todos los mensajes de error y spinners
+   * Actualiza la información del paradero para mostrar los nuevos tiempos de las micros que llegarán
+   * Actualiza la información de la tarjeta bip
+   * Actualiza(obtiene) el nombre personalizado del paradero
+   * @param event
+   */
+  doRefresh(event) {
+    this.displayErrors('stop', '', false, true);
+    this.displayErrors('bip', '', false, true);
+    this.nextArrivals = [];
+    this.bipInfo = null;
+    this.getStopInfo();
+    this.getBipInfo();
+    event.target.complete();
+    this.getInfoFromDB('stop_code');
+    this.getInfoFromDB('stop_name');
   }
 
   // Obtiene la información del paradero obteniendo el codigo y nombre desde la base de datos 
@@ -74,19 +96,17 @@ export class StartPage implements OnInit {
 
   /**
    * Obtiene la informacion de la tarjeta bip desde la base de datos para despues mostrarla en la vista
-   * Primero consulta si se hizo una actualizacion el día de hoy, para asi no tener que cargar los datos 
+   * Primero consulta si se hizo una actualizacion el día de hoy, para asi no tener que cargar los datos
    * a cada rato, ya que la informacion de la API de la bip se actualiza solo 1 vez al día(en la noche)
    * los datos se mantienen iguales durante todo el día, de esta forma se mantienen guardados en la base de datos
-   * hasta que se actualicen nuevamente al consultar por la fecha de la ultima actualizacion(bip_last_update) que está guardada en la base de datos.
-   * 
+   * hasta que se actualicen nuevamente al consultar por la fecha de la ultima actualizacion(bip_last_update) que
+   * está guardada en la base de datos.
    * En el caso de que ya se halla hecho una actualizacion el día de hoy, solo se cargaran los datos de la tarjeta que están
    * guardados en la base de datos
    */
   async getBipInfo() {
-    const bipNumber = await this.databaseService.getValueFromDB('bip_number');
+    const bipNumber = await this.getInfoFromDB('bip_number');
     if (bipNumber !== null) {
-      let bipInfoUpdated = await this.getBipLastUpdate();
-      if(bipInfoUpdated) {
         this.bipService.getBipInfo(bipNumber).subscribe(
           response => {
             this.setBipInfoOnDB(response);
@@ -95,14 +115,10 @@ export class StartPage implements OnInit {
           },
           error => {
             console.log('Error al cargar saldo bip.', error);
-            this.displayErrors('bip', 'Error al carga saldo bip', true, false);
+            this.displayErrors('bip', 'Error al cargar saldo bip.', true, false);
             this.bipInfo = null;
           }
         );
-      } else {
-        this.displayErrors('bip', '', false, false);
-        this.bipInfo = await this.databaseService.getValueFromDB('bip_info');
-      }
     } else {
       this.displayErrors('bip', '¡Agregue el numero de su bip!', true, false);
     }
@@ -115,33 +131,16 @@ export class StartPage implements OnInit {
    * si retorna false es por que no se actualizó es decir ya se hizo una actualizacion el día de hoy
    */
   async getBipLastUpdate() {
-    const bipLastUpdate = await this.databaseService.getValueFromDB('bip_last_update');
+    const bipLastUpdate = await this.getInfoFromDB('bip_last_update');
     const currentDate = this.getCurrentDate();
     if (bipLastUpdate === null || bipLastUpdate !== currentDate) {
       this.setBipLastUpdateOnDB(currentDate);
       return true;
+    } else {
+      this.displayErrors('bip', '', false, false);
+      this.bipInfo = await this.getInfoFromDB('bip_info');
     }
     return false;
-  }
-
-  /**
-   * Evento para refrescar la vista cuando se desliza hacia abajo, el cual realiza las siguientes acciones:
-   * Quita todos los mensajes de error y spinners
-   * Actualiza la información del paradero para mostrar los nuevos tiempos de las micros que llegarán
-   * Actualiza la información de la tarjeta bip
-   * Actualiza(obtiene) el nombre personalizado del paradero
-   * @param event
-   */
-  doRefresh(event) {
-    this.displayErrors('stop', '', false, true);
-    this.displayErrors('bip', '', false, true);
-    this.nextArrivals = [];
-    this.bipInfo = null;
-    this.getStopInfo();
-    this.getBipInfo();
-    event.target.complete();
-    this.getInfoFromDB('stop_code');
-    this.getInfoFromDB('stop_name');
   }
  
   /**
