@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { throwError } from 'rxjs';
 export class MapService {
 
   // Radio alrededor del punto de ubicacion del cliente en el que se buscarán paraderos
-  RADIUS = 1000;
+  RADIUS = environment.stop_radius;
 
   constructor(private http: HttpClient) { }
 

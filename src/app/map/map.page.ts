@@ -31,7 +31,7 @@ export class MapPage implements OnInit, AfterViewInit {
     scaledSize: new google.maps.Size(20, 20), // scaled size
   };
   showSpinner: boolean = true;
-  subcriber: Subscription;
+  subcriber: Subscription = new Subscription();
   shapesDirections: any[] = [];
 
   @ViewChild('mapElement', {static: false}) mapElement: ElementRef;

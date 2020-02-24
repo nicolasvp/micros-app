@@ -23,7 +23,7 @@ export class MicrosPage implements OnInit {
   microsSpinner: boolean = true;
   errorPresent: boolean = true;
   errorMessage: string = '';
-  subcriber: Subscription = null;
+  subcriber: Subscription = new Subscription();
 
   constructor(private activatedRoute: ActivatedRoute,
               private stopService: StopsService,
@@ -45,14 +45,12 @@ export class MicrosPage implements OnInit {
   }
 
   /**
-   * Cuando se cambia de vista se cancelan todas las llamadas a la API
+   * Se desuscribe de cualquier llamada que esté esperando
    * Se quita el spinner de micros
    * Se vacia la lista de micros
    */
   ionViewDidLeave() {
-    if (this.subcriber !== null) {
-      this.subcriber.unsubscribe();
-    }
+    this.subcriber.unsubscribe();
     this.microsSpinner = false;
     this.micros = [];
   }

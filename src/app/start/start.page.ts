@@ -5,6 +5,7 @@ import { Bip } from '../interfaces/bip';
 import { BipService } from '../services/bip.service';
 import { DatabaseService } from '../services/database.service';
 import { AlertController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-start',
@@ -21,6 +22,7 @@ export class StartPage implements OnInit {
   stopErrorMessage: string = '';
   bipErrorPresent: boolean = false;
   bipErrorMessage: string = '';
+  subcriber: Subscription = new Subscription();
   STOP_NAME_MAX_LENGTH: string = '20';
   BIP_NUMBER_MAX_LENGTH: string = '12';
   favoriteStop = {
@@ -44,11 +46,13 @@ export class StartPage implements OnInit {
   }
 
   /**
+   * Se desuscribe de cualquier llamada que esté esperando
    * Vacía la lista de las proximas micros que vendrán
    * Vacía la información de la bip
    * Borra los mensajes de error y muestra los spinners
    */
   ionViewDidLeave() {
+    this.subcriber.unsubscribe();
     this.nextArrivals = [];
     this.bipInfo = null;
     this.displayErrors('bip', '', false, true);
@@ -80,7 +84,7 @@ export class StartPage implements OnInit {
     this.favoriteStop.code = await this.getInfoFromDB('stop_code');
     this.favoriteStop.name = await this.getInfoFromDB('stop_name');
     if (this.favoriteStop.code !== null) {
-      this.stopService.getNextArrivals(this.favoriteStop.code).subscribe(
+      this.subcriber = this.stopService.getNextArrivals(this.favoriteStop.code).subscribe(
         response => {
           this.nextArrivals.push(...response.results);
           this.stopSpinner = false;
@@ -107,7 +111,7 @@ export class StartPage implements OnInit {
   async getBipInfo() {
     const bipNumber = await this.getInfoFromDB('bip_number');
     if (bipNumber !== null) {
-        this.bipService.getBipInfo(bipNumber).subscribe(
+        this.subcriber = this.bipService.getBipInfo(bipNumber).subscribe(
           response => {
             this.setBipInfoOnDB(response);
             this.bipInfo = response;

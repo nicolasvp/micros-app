@@ -15,13 +15,14 @@ describe('Pruebas unitarias para Stops Page', () => {
   let databaseService: DatabaseService = new DatabaseService(null, null);
   let alertController: AlertController = new AlertController();
   let popoverController: PopoverController = new PopoverController(null, null, null);
+  const STOP_CODE = 'PI587';
 
   beforeEach(() => {
     stopsPage = new StopsPage(stopService, alertController, databaseService, popoverController);
     stopsPage.stops = [
         {
             stop_lat: '123.2',
-            stop_code: 'PI587',
+            stop_code: STOP_CODE,
             stop_lon: '321.1',
             agency_id: 'TD',
             stop_id: '1',
@@ -32,7 +33,7 @@ describe('Pruebas unitarias para Stops Page', () => {
  
   it('checkStopInList, deberia retornar true, ya que el elemento buscado si está en la lista', () => {
 
-    const result = stopsPage.checkStopInList('PI587');
+    const result = stopsPage.checkStopInList(STOP_CODE);
 
     const resultExpected = true;
     
@@ -43,7 +44,7 @@ describe('Pruebas unitarias para Stops Page', () => {
 
     stopsPage.stops = [];
 
-    const result = stopsPage.checkStopInList('PI587');
+    const result = stopsPage.checkStopInList(STOP_CODE);
 
     const resultExpected = false;
 

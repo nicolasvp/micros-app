@@ -4,6 +4,7 @@ import { StopsService } from '../services/stops.service';
 import { Stop } from '../interfaces/stop';
 import { DatabaseService } from '../services/database.service';
 import { StopsPopOverComponent } from '../component/stops-pop-over/stops-pop-over.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-stops',
@@ -17,6 +18,7 @@ export class StopsPage {
   errorPresent: boolean = false;
   errorMessage: string = '';
   stopCode: string = '';
+  subcriber: Subscription = new Subscription();
 
   @ViewChild('fabGroup', {static: false}) fabGroup;
 
@@ -31,8 +33,12 @@ export class StopsPage {
     this.getRecentStops();
   }
 
-  // Cuando se sale de la vista se fuerza a cerrar el fab group(boton '+')
+  /**
+   * Se desuscribe de cualquier llamada que esté esperando
+   * Cuando se sale de la vista se fuerza a cerrar el fab group(boton '+')
+   */
   ionViewDidLeave() {
+    this.subcriber.unsubscribe();
     this.fabGroup.close();
   }
 
@@ -149,7 +155,7 @@ export class StopsPage {
 
   /**
    * Evita la duplicidad de los paraderos
-   * Válida si el paradero ya está en la lista, si lo está no hace nada
+   * Válida si el paradero ya está en la lista, si lo está retorna true, sino false
    * @param stopCode: string, codigo del paradero Ej: PI587
    */
   checkStopInList(stopCode: string): boolean {
@@ -165,7 +171,7 @@ export class StopsPage {
   }
 
   /**
-   * Obtiene la información del paradero mediante el codigo del paradero.0
+   * Obtiene la información del paradero mediante el codigo del paradero
    * Luego lo agrega a la base de datos
    * Finalmente quita el spinner y mensajes de errores presentes si es que no surge una excepcion
    * @param stopCode: string, codigo del paradero Ej: PI587
@@ -173,9 +179,9 @@ export class StopsPage {
   getStopInfoAndAddToDB(stopCode: string) {
     if (!this.checkStopInList(stopCode)) {
       this.stopsSpinner = true;
-      this.stopsService.getStopInfo(stopCode.toUpperCase()).subscribe(
+      this.subcriber = this.stopsService.getStopInfo(stopCode.toUpperCase()).subscribe(
         async response => {
-          await this.databaseService.addStopWithObject(response);
+          await this.addStopInfo(response);
           this.getRecentStops();
           this.stopsSpinner = false;
           this.errorPresent = false;
@@ -193,6 +199,14 @@ export class StopsPage {
         }
       );
     }
+  }
+
+  /**
+   * Guarda la información del paradero en la base de datos
+   * @param stopInfo: Stop, información del paradero(stop_name, stop_id, etc)
+   */
+  async addStopInfo(stopInfo: Stop) {
+    await this.databaseService.addStopWithObject(stopInfo);
   }
 
   // Cierra ventana(popover) con las opciones del paradero

@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  stopRadio: 1000
+  stop_radius: 1000
 };
 
 /*
