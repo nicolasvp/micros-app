@@ -9,7 +9,6 @@ import { Subscription } from 'rxjs';
 import { DatabaseService } from '../services/database.service';
 import { Stop } from '../interfaces/stop';
 import { NavController } from '@ionic/angular';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-micros',
@@ -55,7 +54,6 @@ export class MicrosPage implements OnInit {
     this.micros = [];
   }
 
-  // Agrega 
   async addStopToDB() {
     if (this.stopCode !== null) {
       const stopsList = await this.getInfoFromDB('stops_list');
