@@ -40,9 +40,9 @@ export class StartPage implements OnInit {
   // Al entrar a la vista carga la información de las proximas micros que llegarán y de la tarjeta bip
   ionViewWillEnter() {
     this.getStopInfo();
-    if(this.getBipLastUpdate()){
+    if (this.getBipLastUpdate()) {
       this.getBipInfo();
-    } 
+    }
   }
 
   /**
@@ -90,6 +90,7 @@ export class StartPage implements OnInit {
           this.stopSpinner = false;
         },
         error => {
+          console.log(error);
           this.displayErrors('stop', 'Error al cargar información, inténtelo nuevamente.', true, false);
         }
       );

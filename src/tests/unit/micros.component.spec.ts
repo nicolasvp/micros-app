@@ -19,17 +19,7 @@ describe('Pruebas unitarias para Micros Page', () => {
   let activatedRoute: ActivatedRoute;
   let microsService: MicrosService = new MicrosService(null);
   let navCtrl: NavController;
-  const STOPS_MOCK = [
-    {
-      stop_code: 'PI1'
-    },
-    {
-      stop_code: 'PI587'
-    },
-    {
-      stop_code: 'PB13'
-    }
-  ];
+  let STOPS_MOCK = []
 
   beforeEach(() => {
     microsPage = new MicrosPage(
@@ -39,6 +29,12 @@ describe('Pruebas unitarias para Micros Page', () => {
       popoverController,
       databaseService,
       navCtrl);
+
+      STOPS_MOCK = [
+        {stop_code: 'PI1', stop_name: 'Pajaritos'},
+        {stop_code: 'PI587', stop_name: 'Simon bolivar'},
+        {stop_code: 'PB13', stop_name: 'Las torres'}
+      ];
   });
 
   it('checkStopInList, deberia retornar true, ya que el elemento buscado si está en la lista', () => {
@@ -67,6 +63,96 @@ describe('Pruebas unitarias para Micros Page', () => {
     const resultExpected = false;
 
     expect(result).toBe(resultExpected);
+  });
+
+  it('addStopToDB, no deberia agregar nada por que stopCode es null)', async () => {
+    microsPage.stopCode = null;
+
+    const result = await microsPage.addStopToDB();
+    const resultExpected = 0;
+
+    expect(result.length).toEqual(resultExpected);
+  });
+
+  it('addStopToDB, no deberia agregar ningun paradero por que ya está en la lista', async () => {
+    microsPage.stopCode = 'PI1';
+
+    spyOn(microsPage, 'getInfoFromDB')
+    .withArgs('stops_list').and.returnValue(Promise.resolve(STOPS_MOCK));
+
+    spyOn(microsPage, 'checkStopInList')
+    .withArgs(STOPS_MOCK).and.returnValue(true);
+
+    const result = await microsPage.addStopToDB();
+    const resultExpected = 3;
+
+    expect(result.length).toEqual(resultExpected);
+  });
+
+  it('addStopToDB, deberia agregar un paradero a lista', async () => {
+    microsPage.stopCode = 'PI2';
+    STOPS_MOCK.push({stop_name: 'test', stop_code: 'PI2'});
+
+    spyOn(microsPage, 'getInfoFromDB')
+    .withArgs('stops_list').and.returnValue(Promise.resolve(STOPS_MOCK));
+
+    spyOn(microsPage, 'checkStopInList')
+    .withArgs(STOPS_MOCK).and.returnValue(false);
+
+    spyOn(microsPage, 'addStopWithStopCode')
+    .withArgs(microsPage.stopCode).and.returnValue(Promise.resolve(STOPS_MOCK));
+
+    const result = await microsPage.addStopToDB();
+    const resultExpected = 4;
+
+    expect(result.length).toEqual(resultExpected);
+  });
+
+  it('getMicrosInfo, deberia setear microsSpinner como false, ya que el stopCode es null', () => {
+    microsPage.stopCode = null;
+
+    microsPage.getMicrosInfo();
+
+    expect(microsPage.microsSpinner).toBeFalsy();
+  });
+
+  it('getMicrosInfo, deberia setear el array de micros', async () => {
+    microsPage.stopCode = 'PI587';
+
+    const MICROS_MOCK = [
+      {
+        bus_plate_number: 'ASD23',
+        route_id: 'I03',
+        is_live: true,
+        bus_distance: '100'
+      }
+    ]
+
+    spyOn(stopService, 'getNextArrivals').and.callFake( arg => {
+      return Observable.from([MICROS_MOCK]);
+    });
+
+    await microsPage.getMicrosInfo();
+    const resultExpected = MICROS_MOCK.length;
+  
+    expect(microsPage.microsSpinner).toBeFalsy();
+    expect(microsPage.errorPresent).toBeFalsy();
+    expect(microsPage.errorMessage).toBe('');
+  });
+
+  it('getMicrosInfo, no deberia setear el array de micros ya que ocurrió un error en la llamada', async () => {
+    microsPage.stopCode = 'PI587';
+    const msgExpected = 'Error al obtener la informacion';
+
+    spyOn(stopService, 'getNextArrivals').and.callFake( arg => {
+      return Observable.throw(msgExpected);
+    });
+
+    await microsPage.getMicrosInfo();
+  
+    expect(microsPage.errorMessage).toBe(msgExpected);
+    expect(microsPage.microsSpinner).toBeFalsy();
+    expect(microsPage.errorPresent).toBeTruthy();
   });
 
 });

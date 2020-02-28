@@ -36,7 +36,8 @@ export class MapPage implements OnInit, AfterViewInit {
 
   @ViewChild('mapElement', {static: false}) mapElement: ElementRef;
 
-  constructor(public geolocation: Geolocation,
+  constructor(
+    public geolocation: Geolocation,
     private mapService: MapService,
     private stopsService: StopsService,
     public ngZone: NgZone,
@@ -89,6 +90,8 @@ export class MapPage implements OnInit, AfterViewInit {
     this.map = new google.maps.Map(this.mapElement.nativeElement, {
       center: {lat: -33.41271959, lng: -70.6061205}, // parque titanium, las condes
       zoom: 16,
+      compass: true,
+      myLocationButton: true,
       clickableIcons: false
     });
     this.map.addListener('click', () => {

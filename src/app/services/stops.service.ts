@@ -28,7 +28,7 @@ export class StopsService {
         });
         return response;
       }),
-      catchError(e => throwError('Error al cargar información, inténtelo nuevamente.'))
+      catchError(e => throwError(e))
     );
   }
 

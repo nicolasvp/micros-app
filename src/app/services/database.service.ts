@@ -66,6 +66,7 @@ export class DatabaseService {
   /**
    * Obtiene el valor de la base de datos segun la key
    * @param key: string, llave del valor almacenado en la base de datos que se desea obtener
+   * @return value: puede ser un string o un array
    */
   getValueFromDB(key: string) {
     return this.storage.get(key).then(
@@ -113,6 +114,7 @@ export class DatabaseService {
         console.log(error);
       }
     );
+    return this.stops;
   }
 
   /**
