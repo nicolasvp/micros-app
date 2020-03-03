@@ -8,6 +8,7 @@ import { NavController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { MicrosService } from '../services/micros.service';
+import { Util } from '../utils/util';
 
 declare var google;
 
@@ -28,7 +29,7 @@ export class MapPage implements OnInit, AfterViewInit {
   infoWindow: any = null;
   customIcon = {
     url: 'assets/icon/favicon.png', // image url
-    scaledSize: new google.maps.Size(20, 20), // scaled size
+    scaledSize: new google.maps.Size(20, 20) // scaled size
   };
   showSpinner: boolean = true;
   subcriber: Subscription = new Subscription();
@@ -90,9 +91,15 @@ export class MapPage implements OnInit, AfterViewInit {
     this.map = new google.maps.Map(this.mapElement.nativeElement, {
       center: {lat: -33.41271959, lng: -70.6061205}, // parque titanium, las condes
       zoom: 16,
-      compass: true,
+      heading: 3,
       myLocationButton: true,
-      clickableIcons: false
+      clickableIcons: false,
+      // zoomControl: true, // Default true
+      mapTypeControl: false, // Default true, cambia entre mapa y satelite
+      scaleControl: false, // Default false, muestra una escala de altura en el borde inferior del mapa
+      streetViewControl: true, // Default true, monito amarillo de street view
+      rotateControl: true,
+      fullscreenControl: true // Default true, muestra opcion para full screen
     });
     this.map.addListener('click', () => {
       this.closeWindowInfo();
@@ -129,8 +136,6 @@ export class MapPage implements OnInit, AfterViewInit {
           };
         });
         this.drawRoute(points);
-        //const shapesAsPositions = this.setShapesAsPositions(response);
-        //this.setShapeMarkers(shapesAsPositions);
         this.showSpinner = false;
         document.getElementById('map').style.display = 'block';
     });
@@ -153,33 +158,8 @@ export class MapPage implements OnInit, AfterViewInit {
     microRoute.setMap(this.map);
   }
 
-/*
-  // Crea un arreglo con las posiciones de las direcciones
-  setShapesAsPositions(shapes: any[]) {
-    const shapesPositions = [];
-    shapes.forEach( shape => {
-      shapesPositions.push({
-        position: new google.maps.LatLng(shape.shape_pt_lat, shape.shape_pt_lon)
-      });
-    });
-    return shapesPositions;
-  }
-
-  // Crea un arreglo de markers segun los shapes de la micro
-  setShapeMarkers(shapesAsPositions: any[]) {
-    const shapesMarkers = [];
-    shapesAsPositions.forEach( shape => {
-      shapesMarkers.push(new google.maps.Marker({
-        position: shape.position,
-        //icon: this.customIcon,
-        animation: 'DROP',
-        map: this.map
-      }));
-    });
-  }
-*/
-
-  /* Obtiene todos los paraderos de alrededor segun lat y lon y los guarda en un arreglo
+  /*
+  * Obtiene todos los paraderos de alrededor segun lat y lon y los guarda en un arreglo
   * Guarda las posiciones de los paraderos en un arreglo
   * Crea los markers para todos los paraderos
   */
@@ -282,7 +262,6 @@ export class MapPage implements OnInit, AfterViewInit {
     });
   }
 
-
   /**
    * Retorna el HTML en un string con la información que se muestra en el marker
    * @param micros: array, arreglo con todas las micros que se dirigen al paradero
@@ -298,26 +277,11 @@ export class MapPage implements OnInit, AfterViewInit {
 
     return '<div id="' + currentStop.stop_id + '">' +
               '<ion-label style="font-size: 15px;">' +
-                '<strong>' + this.formatStopName(currentStop.stop_name) + '(' + currentStop.stop_id + ')' + '</strong>' +
+                '<strong>' + Util.formatStopName(currentStop.stop_name) + '(' + currentStop.stop_id + ')' + '</strong>' +
               '</ion-label>' +
               '<br><br>' +
               '<ion-label style="font-size: 13px;">' + microsBadges + '</ion-label>' +
             '</div>';
-  }
-
-  /**
-   * Formatea el nombre del paradero para dejarlo sin el codigo al inicio
-   * Ej: PI1-Las Torres / Simon Bolivar => Las Torres / Simon Bolivar
-   * @param stopName: string, nombre del paradero
-   */
-  formatStopName(stopName: string) {
-    const splits = stopName.split('-');
-    if (splits.length > 1) {
-      length = splits[0].length;
-      return stopName.substr(length + 1, stopName.length);
-    } else {
-      return stopName;
-    }
   }
 
   // Cierra el infoWindow que está abierto

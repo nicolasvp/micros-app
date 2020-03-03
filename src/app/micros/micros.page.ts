@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { DatabaseService } from '../services/database.service';
 import { Stop } from '../interfaces/stop';
 import { NavController } from '@ionic/angular';
+import { Util } from '../utils/util';
 
 @Component({
   selector: 'app-micros',
@@ -65,7 +66,7 @@ export class MicrosPage implements OnInit {
     }
     event.target.complete();
   }
-  
+
   /**
    * Obtiene la lista de paraderos de la base de datos y luego valida si el paradero está en la lista
    * Si el paradero no está, entonces lo agrega y si está no lo agrega
@@ -74,7 +75,7 @@ export class MicrosPage implements OnInit {
     let stopsList = [];
     if (this.stopCode !== null) {
       stopsList = await this.getInfoFromDB('stops_list'); // devuelve un array o null
-      if (!this.checkStopInList(stopsList)) {
+      if (!Util.checkStopInList(stopsList, this.stopCode)) {
         stopsList = await this.addStopWithStopCode(this.stopCode);
       }
     }
@@ -91,24 +92,6 @@ export class MicrosPage implements OnInit {
   }
 
   /**
-   * Válida si el paradero que se guarda en la variable de clase stopCode ya está en la lista de paradero, si lo está no hace nada
-   * devolviendo true si está o false si no está
-   * @param stops: arreglo de Stop que se recorrerá para determinar si está o no el paradero
-   * @return boolean: true o false
-   */
-  checkStopInList(stops: Stop[]): boolean {
-    let isPresent = false;
-    if (stops !== null) {
-      stops.forEach( value => {
-        if (value.stop_code === this.stopCode.toUpperCase()) {
-          isPresent = true;
-        }
-      });
-    }
-    return isPresent;
-  }
-
-  /**
    * Obtiene la informacion de la base de datos segun la llave que se le pase
    * @param key: string, llave del json para buscar en la base de datos
    * @return value: puede ser un string o un array
@@ -119,7 +102,7 @@ export class MicrosPage implements OnInit {
 
   // Obtiene el tiempo en que llegaran las proximas micros
   getMicrosInfo() {
-    if(this.stopCode === null) {
+    if (this.stopCode === null) {
       this.microsSpinner = false;
     } else {
       this.microsSpinner = true;

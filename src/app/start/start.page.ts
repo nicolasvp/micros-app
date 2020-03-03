@@ -6,6 +6,7 @@ import { BipService } from '../services/bip.service';
 import { DatabaseService } from '../services/database.service';
 import { AlertController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { Util } from '../utils/util';
 
 @Component({
   selector: 'app-start',
@@ -137,7 +138,7 @@ export class StartPage implements OnInit {
    */
   async getBipLastUpdate() {
     const bipLastUpdate = await this.getInfoFromDB('bip_last_update');
-    const currentDate = this.getCurrentDate();
+    const currentDate = Util.getCurrentDate();
     if (bipLastUpdate === null || bipLastUpdate !== currentDate) {
       this.setBipLastUpdateOnDB(currentDate);
       return true;
@@ -289,14 +290,5 @@ export class StartPage implements OnInit {
       this.stopErrorMessage = message;
       this.stopSpinner = spinner;
     }
-  }
-
-  // Obtiene la fecha actual y le da el formato dd/mm/yyyy
-  getCurrentDate() {
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    const yyyy = today.getFullYear();
-    return dd + '/' + mm + '/' + yyyy;
   }
 }

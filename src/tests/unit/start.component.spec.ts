@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/throw';
+import { Util } from 'src/app/utils/util';
 
 describe('Pruebas unitarias para Start Page', () => {
 
@@ -19,12 +20,9 @@ describe('Pruebas unitarias para Start Page', () => {
   beforeEach(() => {
     startPage = new StartPage(stopService, bipService, databaseService, alertController);
   });
- 
+
   it('getCurrentDate, deberia contener el año 2020', () => {
-
-    const currentDate = startPage.getCurrentDate();
-    const expectedDate = '20/02/2020';
-
+    const currentDate = Util.getCurrentDate();
     expect(currentDate).toContain('2020');
   });
 
@@ -36,7 +34,6 @@ describe('Pruebas unitarias para Start Page', () => {
     startPage.displayErrors('stop', '', false, false);
     expect(startPage.stopErrorMessage).toBe('');
   });
-
 
   // Con async se indica que se está testeando una función asincrona y que devolverá una promesa
   it('getStopInfo, deberia guardar datos en el arreglo de nextArrivals', async () => {
@@ -77,12 +74,11 @@ describe('Pruebas unitarias para Start Page', () => {
     expect(startPage.nextArrivals.length).toBeGreaterThan(0);
   });
 
-
   it("getStopInfo, deberia mostrar el mensaje '¡Agregue un paradero como favorito!'", async () => {
 
     const msgExpected = '¡Agregue un paradero como favorito!';
 
-    //Si se llama getInfoFromDB con el argumento 'stop_code' y 'stop_name' se devuelve null
+    // Si se llama getInfoFromDB con el argumento 'stop_code' y 'stop_name' se devuelve null
     spyOn(startPage, 'getInfoFromDB')
     .withArgs('stop_code').and.returnValue(Promise.resolve(null))
     .withArgs('stop_name').and.returnValue(Promise.resolve(null));
@@ -100,7 +96,7 @@ describe('Pruebas unitarias para Start Page', () => {
 
     const msgExpected = 'Error al cargar información, inténtelo nuevamente.';
 
-     spyOn(startPage, 'getInfoFromDB')
+    spyOn(startPage, 'getInfoFromDB')
     .withArgs('stop_code').and.returnValue(Promise.resolve('PI587'))
     .withArgs('stop_name').and.returnValue(Promise.resolve('Casa'));
 
@@ -121,7 +117,7 @@ describe('Pruebas unitarias para Start Page', () => {
   it('getBipInfo, deberia guardar datos de la tarjeta bip', async () => {
 
     const bipInfoExpected = {
-      'id': 1,
+      id: 1,
       estadoContrato: '123',
       saldoTarjeta: '500',
       fechaSaldo: '21/02/2020'
@@ -182,12 +178,12 @@ describe('Pruebas unitarias para Start Page', () => {
     expect(startPage.bipSpinner).toBe(false);
   });
 
-  it("getBipLastUpdate, deberia retornar true ya que las fechas son distintas", async () => {
+  it('getBipLastUpdate, deberia retornar true ya que las fechas son distintas', async () => {
 
     spyOn(startPage, 'getInfoFromDB')
     .withArgs('bip_last_update').and.returnValue(Promise.resolve('20/02/2020'));
 
-    spyOn(startPage, 'getCurrentDate').and.returnValue('21/02/2020');
+    spyOn(Util, 'getCurrentDate').and.returnValue('21/02/2020');
 
     // Spy para metodo setBipLastUpdateOnDB de startPage que no retorna nada
     spyOn(startPage, 'setBipLastUpdateOnDB').and.callFake( arg => {
@@ -199,12 +195,12 @@ describe('Pruebas unitarias para Start Page', () => {
     expect(result).toBeTruthy();
   });
 
-  it("getBipLastUpdate, deberia retornar true ya que la fecha de la ultima actualizacion es null", async () => {
+  it('getBipLastUpdate, deberia retornar true ya que la fecha de la ultima actualizacion es null', async () => {
 
     spyOn(startPage, 'getInfoFromDB')
     .withArgs('bip_last_update').and.returnValue(null);
 
-    spyOn(startPage, 'getCurrentDate').and.returnValue('21/02/2020');
+    spyOn(Util, 'getCurrentDate').and.returnValue('21/02/2020');
 
     // Spy para metodo setBipLastUpdateOnDB de startPage que no retorna nada
     spyOn(startPage, 'setBipLastUpdateOnDB').and.callFake( arg => {
@@ -216,7 +212,7 @@ describe('Pruebas unitarias para Start Page', () => {
     expect(result).toBeTruthy();
   });
 
-  it("getBipLastUpdate, deberia retornar false ya que las fechas son iguales", async () => {
+  it('getBipLastUpdate, deberia retornar false ya que las fechas son iguales', async () => {
 
     const bipInfoExpected = {
       'id': 1,
@@ -229,7 +225,7 @@ describe('Pruebas unitarias para Start Page', () => {
     .withArgs('bip_last_update').and.returnValue(Promise.resolve('21/02/2020'))
     .withArgs('bip_info').and.returnValue(Promise.resolve(bipInfoExpected));
 
-    spyOn(startPage, 'getCurrentDate').and.returnValue('21/02/2020');
+    spyOn(Util, 'getCurrentDate').and.returnValue('21/02/2020');
 
     // Spy para metodo setBipLastUpdateOnDB de startPage que no retorna nada
     spyOn(startPage, 'setBipLastUpdateOnDB').and.callFake( arg => {

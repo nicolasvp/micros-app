@@ -5,6 +5,7 @@ import { Stop } from '../interfaces/stop';
 import { DatabaseService } from '../services/database.service';
 import { StopsPopOverComponent } from '../component/stops-pop-over/stops-pop-over.component';
 import { Subscription } from 'rxjs';
+import { Util } from '../utils/util';
 
 @Component({
   selector: 'app-stops',
@@ -153,22 +154,6 @@ export class StopsPage {
     await stopAlert.present();
   }
 
-  /**
-   * Evita la duplicidad de los paraderos
-   * Válida si el paradero ya está en la lista, si lo está retorna true, sino false
-   * @param stopCode: string, codigo del paradero Ej: PI587
-   */
-  checkStopInList(stopCode: string): boolean {
-    let isPresent = false;
-    if (this.stops !== null) {
-      this.stops.forEach( value => {
-        if (value.stop_code === stopCode.toUpperCase()) {
-          isPresent = true;
-        }
-      });
-    }
-    return isPresent;
-  }
 
   /**
    * Obtiene la información del paradero mediante el codigo del paradero
@@ -177,7 +162,7 @@ export class StopsPage {
    * @param stopCode: string, codigo del paradero Ej: PI587
    */
   getStopInfoAndAddToDB(stopCode: string) {
-    if (!this.checkStopInList(stopCode)) {
+    if (!Util.checkStopInList(this.stops, stopCode)) {
       this.stopsSpinner = true;
       this.subcriber = this.stopsService.getStopInfo(stopCode.toUpperCase()).subscribe(
         async response => {

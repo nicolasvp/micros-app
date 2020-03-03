@@ -30,35 +30,5 @@ describe('Pruebas unitarias para Stops Page', () => {
         }
     ];
   });
- 
-  it('checkStopInList, deberia retornar true, ya que el elemento buscado si está en la lista', () => {
 
-    const result = stopsPage.checkStopInList(STOP_CODE);
-
-    const resultExpected = true;
-    
-    expect(result).toBe(resultExpected);
-  });
-
-  it('checkStopInList, deberia retornar false, ya que la lista de paraderos(stops) es null', () => {
-
-    stopsPage.stops = [];
-
-    const result = stopsPage.checkStopInList(STOP_CODE);
-
-    const resultExpected = false;
-
-    expect(result).toBe(resultExpected);
-  });
-
-  it('checkStopInList, deberia retornar false, ya que el elemento buscado no está en la lista', () => {
-
-    stopsPage.stops = [];
-    
-    const result = stopsPage.checkStopInList('PF123');
-
-    const resultExpected = false;
-
-    expect(result).toBe(resultExpected);
-  });
 });

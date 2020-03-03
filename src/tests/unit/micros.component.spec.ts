@@ -2,12 +2,13 @@ import { MicrosPage } from '../../app/micros/micros.page';
 import { StopsService } from '../../app/services/stops.service';
 import { MicrosService } from '../../app/services/micros.service';
 import { DatabaseService } from '../../app/services/database.service';
-import { AlertController, PopoverController, NavController } from '@ionic/angular';
+import { PopoverController, NavController } from '@ionic/angular';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/throw';
 import { ActivatedRoute } from '@angular/router';
+import { Util } from 'src/app/utils/util';
 
 
 describe('Pruebas unitarias para Micros Page', () => {
@@ -19,7 +20,7 @@ describe('Pruebas unitarias para Micros Page', () => {
   let activatedRoute: ActivatedRoute;
   let microsService: MicrosService = new MicrosService(null);
   let navCtrl: NavController;
-  let STOPS_MOCK = []
+  let STOPS_MOCK = [];
 
   beforeEach(() => {
     microsPage = new MicrosPage(
@@ -30,39 +31,11 @@ describe('Pruebas unitarias para Micros Page', () => {
       databaseService,
       navCtrl);
 
-      STOPS_MOCK = [
+    STOPS_MOCK = [
         {stop_code: 'PI1', stop_name: 'Pajaritos'},
         {stop_code: 'PI587', stop_name: 'Simon bolivar'},
         {stop_code: 'PB13', stop_name: 'Las torres'}
       ];
-  });
-
-  it('checkStopInList, deberia retornar true, ya que el elemento buscado si está en la lista', () => {
-    microsPage.stopCode = 'PI587';
-
-    const result = microsPage.checkStopInList(STOPS_MOCK);
-
-    const resultExpected = true;
-
-    expect(result).toBe(resultExpected);
-  });
-
-  it('checkStopInList, deberia retornar false, ya que el elemento buscado no está en la lista', () => {
-    microsPage.stopCode = 'PI600';
-
-    const result = microsPage.checkStopInList(STOPS_MOCK);
-
-    const resultExpected = false;
-
-    expect(result).toBe(resultExpected);
-  });
-
-  it('checkStopInList, deberia retornar false, ya que el array de stops es null', () => {
-    const result = microsPage.checkStopInList(null);
-
-    const resultExpected = false;
-
-    expect(result).toBe(resultExpected);
   });
 
   it('addStopToDB, no deberia agregar nada por que stopCode es null)', async () => {
@@ -80,8 +53,8 @@ describe('Pruebas unitarias para Micros Page', () => {
     spyOn(microsPage, 'getInfoFromDB')
     .withArgs('stops_list').and.returnValue(Promise.resolve(STOPS_MOCK));
 
-    spyOn(microsPage, 'checkStopInList')
-    .withArgs(STOPS_MOCK).and.returnValue(true);
+    spyOn(Util, 'checkStopInList')
+    .and.returnValue(true);
 
     const result = await microsPage.addStopToDB();
     const resultExpected = 3;
@@ -96,8 +69,8 @@ describe('Pruebas unitarias para Micros Page', () => {
     spyOn(microsPage, 'getInfoFromDB')
     .withArgs('stops_list').and.returnValue(Promise.resolve(STOPS_MOCK));
 
-    spyOn(microsPage, 'checkStopInList')
-    .withArgs(STOPS_MOCK).and.returnValue(false);
+    spyOn(Util, 'checkStopInList')
+    .and.returnValue(false);
 
     spyOn(microsPage, 'addStopWithStopCode')
     .withArgs(microsPage.stopCode).and.returnValue(Promise.resolve(STOPS_MOCK));
@@ -110,9 +83,7 @@ describe('Pruebas unitarias para Micros Page', () => {
 
   it('getMicrosInfo, deberia setear microsSpinner como false, ya que el stopCode es null', () => {
     microsPage.stopCode = null;
-
     microsPage.getMicrosInfo();
-
     expect(microsPage.microsSpinner).toBeFalsy();
   });
 
@@ -134,7 +105,7 @@ describe('Pruebas unitarias para Micros Page', () => {
 
     await microsPage.getMicrosInfo();
     const resultExpected = MICROS_MOCK.length;
-  
+
     expect(microsPage.microsSpinner).toBeFalsy();
     expect(microsPage.errorPresent).toBeFalsy();
     expect(microsPage.errorMessage).toBe('');
@@ -149,7 +120,7 @@ describe('Pruebas unitarias para Micros Page', () => {
     });
 
     await microsPage.getMicrosInfo();
-  
+
     expect(microsPage.errorMessage).toBe(msgExpected);
     expect(microsPage.microsSpinner).toBeFalsy();
     expect(microsPage.errorPresent).toBeTruthy();

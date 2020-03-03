@@ -19,12 +19,5 @@ describe('Pruebas de integracion para Start Page', () => {
   beforeEach(() => {
     startPage = new StartPage(stopService, bipService, databaseService, alertController);
   });
- 
-  it('Deberia contener el año 2020', () => {
 
-    const currentDate = startPage.getCurrentDate();
-    const expectedDate = '20/02/2020';
-
-    expect(currentDate).toContain('2020');
-  });
 });

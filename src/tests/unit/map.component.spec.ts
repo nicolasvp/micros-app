@@ -11,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 import { NgZone } from '@angular/core';
 import { NavController } from '@ionic/angular';
+import { Util } from 'src/app/utils/util';
 
 declare var google;
 
@@ -37,21 +38,14 @@ describe('Pruebas unitarias para Map Page', () => {
   });
 
   xit("formatStopName, deberia retornar 'Las Torres / Simon Bolivar'", () => {
-
-    const result = mapPage.formatStopName('PI1-Las Torres / Simon Bolivar');
-
+    const result = Util.formatStopName('PI1-Las Torres / Simon Bolivar');
     const resultExpected = 'Las Torres / Simon Bolivar';
-
     expect(result).toBe(resultExpected);
   });
 
   xit("formatStopName, deberia retornar ''", () => {
-
-    const result = mapPage.formatStopName('');
-
+    const result = Util.formatStopName('');
     const resultExpected = '';
-
     expect(result).toBe(resultExpected);
   });
-  
 });
